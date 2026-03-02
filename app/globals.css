@@ -1,0 +1,178 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 15, 23, 42;
+  --background-rgb: 248, 250, 252;
+}
+
+html.dark {
+  --foreground-rgb: 248, 250, 252;
+  --background-rgb: 15, 23, 42;
+}
+
+html.dark ::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+  background: #78350f;
+}
+
+html.dark ::-webkit-scrollbar-thumb:hover {
+  background: #b45309;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: rgb(var(--background-rgb));
+  font-family: 'Inter', sans-serif;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+/* ============================================================
+   THEME ANIMATIONS
+   ============================================================ */
+
+/* --- Dark mode: Falling stars (top-right → bottom-left) --- */
+@keyframes fallingStar {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0;
+  }
+
+  10% {
+    opacity: 1;
+  }
+
+  80% {
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: translate(-110vw, 110vh) scale(0.3);
+    opacity: 0;
+  }
+}
+
+.falling-star {
+  animation: fallingStar linear infinite;
+  box-shadow: 0 0 6px 2px rgba(255, 255, 255, 0.6);
+}
+
+/* --- Dark mode: Shooting star trail --- */
+@keyframes shootingStar {
+  0% {
+    transform: translate(0, 0) rotate(225deg) scaleX(0);
+    opacity: 0;
+  }
+
+  5% {
+    opacity: 1;
+    transform: translate(0, 0) rotate(225deg) scaleX(1);
+  }
+
+  60% {
+    opacity: 0.6;
+    transform: translate(-60vw, 60vh) rotate(225deg) scaleX(1);
+  }
+
+  100% {
+    transform: translate(-80vw, 80vh) rotate(225deg) scaleX(0);
+    opacity: 0;
+  }
+}
+
+.shooting-star {
+  width: 120px;
+  height: 2px;
+  background: linear-gradient(to left, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.9));
+  border-radius: 999px;
+  animation: shootingStar ease-in infinite;
+  animation-duration: 3s;
+}
+
+/* --- Light mode: Sun rays pulse --- */
+@keyframes sunRayPulse {
+
+  0%,
+  100% {
+    transform: var(--ray-transform) scaleY(1);
+    opacity: 0.6;
+  }
+
+  50% {
+    transform: var(--ray-transform) scaleY(1.4);
+    opacity: 1;
+  }
+}
+
+.sun-ray {
+  animation: sunRayPulse 2s ease-in-out infinite;
+}
+
+/* --- Light mode: Sun rises from bottom --- */
+@keyframes sunRise {
+  0% {
+    transform: translateX(-50%) translateY(100%);
+    opacity: 0;
+  }
+
+  30% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateX(-50%) translateY(30%);
+    opacity: 1;
+  }
+}
+
+.sunrise-sun {
+  animation: sunRise 2.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* --- Light mode: Horizon glow pulse --- */
+@keyframes glowPulse {
+
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.sunrise-glow {
+  animation: glowPulse 3s ease-in-out infinite;
+}
