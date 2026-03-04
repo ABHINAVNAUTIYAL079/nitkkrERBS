@@ -19,6 +19,8 @@ export interface IBooking extends Document {
     notes?: string;
     distanceKm?: number;
     fareAmount?: number;
+    rideType?: "shared" | "private";
+    nightSurcharge?: number;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -40,6 +42,8 @@ const BookingSchema = new Schema<IBooking>(
         notes: { type: String, default: "" },
         distanceKm: { type: Number, default: null },
         fareAmount: { type: Number, default: null },
+        rideType: { type: String, enum: ["shared", "private"], default: null },
+        nightSurcharge: { type: Number, default: 0 },
     },
     { timestamps: true }
 );

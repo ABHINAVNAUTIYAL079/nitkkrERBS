@@ -2,7 +2,7 @@
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import Link from "next/link";
-import { CheckCircle, MapPin, ArrowLeft, Clock } from "lucide-react";
+import { CheckCircle, MapPin, ArrowLeft, Clock, IndianRupee, Users, User } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
@@ -10,6 +10,9 @@ function ConfirmContent() {
     const params = useSearchParams();
     const bookingId = params.get("bookingId") || "—";
     const name = params.get("name") || "Student";
+    const fare = params.get("fare");
+    const distance = params.get("distance");
+    const rideType = params.get("rideType") || "shared";
 
     return (
         <div className="min-h-[70vh] flex items-center justify-center px-4">
@@ -28,7 +31,7 @@ function ConfirmContent() {
                 </p>
 
                 {/* Booking ID */}
-                <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 mb-6">
+                <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 mb-4">
                     <p className="text-xs text-slate-400 uppercase tracking-wide mb-1">
                         Booking ID
                     </p>
@@ -39,6 +42,32 @@ function ConfirmContent() {
                         Save this ID to track your booking
                     </p>
                 </div>
+
+                {/* Fare Summary */}
+                {(fare || distance) && (
+                    <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 mb-6 text-left">
+                        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">Fare Summary</p>
+                        <div className="space-y-2">
+                            <div className="flex justify-between items-center text-sm">
+                                <span className="flex items-center gap-1.5 text-slate-600">
+                                    {rideType === "shared"
+                                        ? <><Users className="w-4 h-4 text-emerald-500" /> Shared Ride</>
+                                        : <><User className="w-4 h-4 text-blue-500" /> Private Ride</>
+                                    }
+                                </span>
+                                <span className="text-slate-500 text-xs">{distance ? `${parseFloat(distance).toFixed(1)} km` : ""}</span>
+                            </div>
+                            {fare && (
+                                <div className="flex justify-between items-center text-sm border-t border-emerald-200 pt-2">
+                                    <span className="font-semibold text-slate-700">Estimated Fare</span>
+                                    <span className="flex items-center gap-1 font-bold text-emerald-600 text-lg">
+                                        <IndianRupee className="w-4 h-4" />{fare}
+                                    </span>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
 
                 {/* Status timeline */}
                 <div className="text-left mb-8">
@@ -74,7 +103,7 @@ function ConfirmContent() {
 
                 <div className="flex gap-3">
                     <Link
-                        href="/"
+                        href="/dashboard"
                         className="flex-1 flex items-center justify-center gap-2 py-3 border border-slate-200 text-slate-700 font-semibold rounded-xl hover:bg-slate-50 transition-colors text-sm"
                     >
                         <ArrowLeft className="w-4 h-4" />
@@ -85,7 +114,7 @@ function ConfirmContent() {
                         className="flex-1 flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold rounded-xl hover:shadow-md transition-all text-sm"
                     >
                         <MapPin className="w-4 h-4" />
-                        Track Bookings
+                        Track Booking
                     </Link>
                 </div>
             </div>
@@ -104,3 +133,4 @@ export default function BookingConfirmPage() {
         </div>
     );
 }
+

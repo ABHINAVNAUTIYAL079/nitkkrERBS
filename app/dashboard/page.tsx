@@ -2,9 +2,10 @@
 import { useState, useEffect, useCallback } from "react";
 import dynamic from "next/dynamic";
 import toast from "react-hot-toast";
-import { MapPin, ArrowRight, LogOut, Clock, History, IndianRupee, Navigation } from "lucide-react";
+import { MapPin, ArrowRight, LogOut, Clock, History, IndianRupee, Navigation, Users, User, Moon } from "lucide-react";
 import { Spinner } from "@/components/ui";
 import LocationSearch, { LocationResult } from "@/components/LocationSearch";
+import { calculateFare, FARE_CONFIG, isNightTime, type RideType } from "@/lib/fareUtils";
 
 const KurukshetraMap = dynamic(() => import("@/components/KurukshetraMap"), {
     ssr: false,
@@ -34,12 +35,7 @@ const STATUS_STYLES: Record<string, string> = {
     on_the_way: "bg-purple-500/20 text-purple-300 border-purple-500/30",
 };
 
-// Fare calculation: ₹10 base + ₹5/km
-const BASE_FARE = 10;
-const PER_KM = 5;
-function calcFare(km: number): number {
-    return Math.round(BASE_FARE + km * PER_KM);
-}
+// Fare is now handled by lib/fareUtils.ts
 
 type Tab = "book" | "history";
 
@@ -54,6 +50,8 @@ export default function DashboardPage() {
     const [loading, setLoading] = useState(false);
     const [pageLoading, setPageLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<Tab>("book");
+    const [rideType, setRideType] = useState<RideType>("shared");
+    const [isNight] = useState(() => isNightTime());
 
     useEffect(() => {
         async function init() {
@@ -97,7 +95,8 @@ export default function DashboardPage() {
         setDurationMin(null);
     };
 
-    const fareAmount = distanceKm !== null ? calcFare(distanceKm) : null;
+    const fareBreakdown = distanceKm !== null ? calculateFare(distanceKm, rideType) : null;
+    const fareAmount = fareBreakdown?.totalFare ?? null;
 
     const handleBook = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -119,12 +118,14 @@ export default function DashboardPage() {
                     dropLocation: drop.label,
                     distanceKm: distanceKm ? parseFloat(distanceKm.toFixed(2)) : null,
                     fareAmount,
+                    rideType,
+                    nightSurcharge: fareBreakdown?.nightSurcharge ?? 0,
                 }),
             });
             const data = await res.json();
             if (!res.ok) { toast.error(data.message || "Booking failed"); return; }
             toast.success("🛺 Ride booked! Check confirmation below.");
-            const confirmUrl = `/booking-confirm?bookingId=${data.booking.bookingId}&name=${encodeURIComponent(user?.name || "")}&distance=${distanceKm ? distanceKm.toFixed(2) : ""}&fare=${fareAmount ?? ""}`;
+            const confirmUrl = `/booking-confirm?bookingId=${data.booking.bookingId}&name=${encodeURIComponent(user?.name || "")}&distance=${distanceKm ? distanceKm.toFixed(2) : ""}&fare=${fareAmount ?? ""}&rideType=${rideType}`;
             window.location.href = confirmUrl;
         } catch { toast.error("Network error."); }
         finally { setLoading(false); }
@@ -208,8 +209,50 @@ export default function DashboardPage() {
                         <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-xl">
                             <h2 className="text-lg font-bold text-white mb-5 flex items-center gap-2">
                                 <MapPin className="w-5 h-5 text-emerald-400" /> Book a Ride
+                                {isNight && (
+                                    <span className="ml-auto flex items-center gap-1 text-xs bg-indigo-900/40 border border-indigo-700/50 text-indigo-300 px-2 py-0.5 rounded-full">
+                                        <Moon className="w-3 h-3" /> Night +₹5
+                                    </span>
+                                )}
                             </h2>
                             <form onSubmit={handleBook} className="space-y-5">
+
+                                {/* Ride Type Selector */}
+                                <div>
+                                    <label className="block text-xs font-medium text-slate-300 mb-2">Ride Type</label>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        {(["shared", "private"] as RideType[]).map((type) => {
+                                            const cfg = FARE_CONFIG[type];
+                                            const isSelected = rideType === type;
+                                            return (
+                                                <button
+                                                    key={type}
+                                                    type="button"
+                                                    onClick={() => setRideType(type)}
+                                                    className={`flex flex-col items-start gap-1 p-3 rounded-xl border text-left transition-all ${
+                                                        isSelected
+                                                            ? type === "shared"
+                                                                ? "bg-emerald-500/20 border-emerald-500/60 ring-1 ring-emerald-500/40"
+                                                                : "bg-blue-500/20 border-blue-500/60 ring-1 ring-blue-500/40"
+                                                            : "bg-slate-800/50 border-slate-700/50 hover:border-slate-500"
+                                                    }`}
+                                                >
+                                                    <div className="flex items-center gap-1.5">
+                                                        {type === "shared" ? <Users className="w-4 h-4 text-emerald-400" /> : <User className="w-4 h-4 text-blue-400" />}
+                                                        <span className={`text-sm font-semibold ${isSelected ? "text-white" : "text-slate-300"}`}>
+                                                            {cfg.label}
+                                                        </span>
+                                                    </div>
+                                                    <p className={`text-xs ${isSelected ? "text-slate-300" : "text-slate-500"}`}>{cfg.description}</p>
+                                                    <p className={`text-xs font-medium mt-0.5 ${isSelected ? (type === "shared" ? "text-emerald-400" : "text-blue-400") : "text-slate-400"}`}>
+                                                        ₹{cfg.base} base · ₹{cfg.perKm}/km
+                                                    </p>
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+
                                 {/* Pickup */}
                                 <div>
                                     <label className="block text-xs font-medium text-slate-300 mb-1.5">
@@ -238,10 +281,10 @@ export default function DashboardPage() {
                                     />
                                 </div>
 
-                                {/* Fare Card — appears after route is calculated */}
+                                {/* Fare Breakdown Card — appears after route is calculated */}
                                 {pickup && drop && (
                                     <div className={`rounded-xl border p-4 transition-all ${distanceKm !== null
-                                        ? "bg-emerald-900/30 border-emerald-700/50"
+                                        ? "bg-emerald-900/20 border-emerald-700/40"
                                         : "bg-slate-800/60 border-slate-700/50"
                                         }`}>
                                         {distanceKm === null ? (
@@ -250,26 +293,43 @@ export default function DashboardPage() {
                                                 <span>Calculating route & fare…</span>
                                             </div>
                                         ) : (
-                                            <div className="space-y-2">
-                                                <div className="flex items-center justify-between">
-                                                    <div className="flex items-center gap-2 text-slate-300 text-sm">
-                                                        <Navigation className="w-4 h-4 text-orange-400" />
-                                                        <span className="font-medium">
-                                                            {distanceKm.toFixed(1)} km
-                                                        </span>
-                                                        {durationMin !== null && (
-                                                            <span className="text-slate-500">· ~{durationMin} min</span>
-                                                        )}
-                                                    </div>
-                                                    <div className="flex items-center gap-1 bg-emerald-500/20 border border-emerald-500/30 rounded-lg px-3 py-1">
-                                                        <IndianRupee className="w-3.5 h-3.5 text-emerald-400" />
-                                                        <span className="text-emerald-300 font-bold text-sm">{fareAmount}</span>
-                                                        <span className="text-emerald-500 text-xs">est.</span>
-                                                    </div>
+                                            <div className="space-y-2.5">
+                                                {/* Route info */}
+                                                <div className="flex items-center gap-2 text-slate-300 text-sm">
+                                                    <Navigation className="w-4 h-4 text-orange-400" />
+                                                    <span className="font-medium">{distanceKm.toFixed(1)} km</span>
+                                                    {durationMin !== null && (
+                                                        <span className="text-slate-500">· ~{durationMin} min</span>
+                                                    )}
                                                 </div>
-                                                <p className="text-xs text-slate-500">
-                                                    Fare: ₹{BASE_FARE} base + ₹{PER_KM}/km · Final may vary slightly
-                                                </p>
+                                                {/* Fare breakdown */}
+                                                {fareBreakdown && (
+                                                    <div className="bg-slate-900/40 rounded-lg p-3 space-y-1.5 text-xs">
+                                                        <div className="flex justify-between text-slate-400">
+                                                            <span>Base fare ({FARE_CONFIG[rideType].label})</span>
+                                                            <span>₹{fareBreakdown.baseFare}</span>
+                                                        </div>
+                                                        {fareBreakdown.distanceFare > 0 && (
+                                                            <div className="flex justify-between text-slate-400">
+                                                                <span>Distance ({distanceKm.toFixed(1)} km − {FARE_CONFIG[rideType].freeKm} km free)</span>
+                                                                <span>₹{fareBreakdown.distanceFare}</span>
+                                                            </div>
+                                                        )}
+                                                        {fareBreakdown.isNight && (
+                                                            <div className="flex justify-between text-indigo-400">
+                                                                <span className="flex items-center gap-1"><Moon className="w-3 h-3" /> Night surcharge</span>
+                                                                <span>+₹{fareBreakdown.nightSurcharge}</span>
+                                                            </div>
+                                                        )}
+                                                        <div className="border-t border-slate-700 pt-1.5 flex justify-between font-semibold text-white">
+                                                            <span>Total Fare</span>
+                                                            <span className="flex items-center gap-1 text-emerald-400">
+                                                                <IndianRupee className="w-3.5 h-3.5" />{fareBreakdown.totalFare}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                                <p className="text-xs text-slate-500">Final fare may vary slightly based on actual route</p>
                                             </div>
                                         )}
                                     </div>

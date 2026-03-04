@@ -13,7 +13,7 @@ function generateBookingId(): string {
 export async function POST(req: NextRequest) {
     try {
         await dbConnect();
-        const { studentName, phone, pickupLocation, dropLocation, distanceKm, fareAmount } = await req.json();
+        const { studentName, phone, pickupLocation, dropLocation, distanceKm, fareAmount, rideType, nightSurcharge } = await req.json();
 
         if (!studentName || !phone || !pickupLocation || !dropLocation) {
             return NextResponse.json(
@@ -46,6 +46,8 @@ export async function POST(req: NextRequest) {
             status: "pending",
             distanceKm: distanceKm ?? null,
             fareAmount: fareAmount ?? null,
+            rideType: rideType ?? null,
+            nightSurcharge: nightSurcharge ?? 0,
         });
 
         return NextResponse.json(
