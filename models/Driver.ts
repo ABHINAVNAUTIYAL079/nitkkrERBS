@@ -5,7 +5,7 @@ export interface IDriver extends Document {
     phone: string;
     password: string;
     rickshawNumber: string;
-    nitRegistrationId: string;
+    nitRegistrationId?: string;
     status: "pending" | "approved" | "suspended";
     isAvailable: boolean;
     createdAt: Date;
@@ -17,7 +17,7 @@ const DriverSchema = new Schema<IDriver>(
         phone: { type: String, required: true, unique: true, trim: true },
         password: { type: String, required: true },
         rickshawNumber: { type: String, required: true, unique: true, trim: true },
-        nitRegistrationId: { type: String, required: true, unique: true, trim: true },
+        nitRegistrationId: { type: String, unique: true, sparse: true, trim: true },
         status: {
             type: String,
             enum: ["pending", "approved", "suspended"],

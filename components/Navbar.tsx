@@ -34,12 +34,6 @@ export default function Navbar() {
                         >
                             About Us
                         </Link>
-                        <Link
-                            href="/contact"
-                            className="px-4 py-2 text-sm font-medium text-slate-300 hover:text-amber-400 hover:bg-amber-900/20 rounded-lg transition-colors"
-                        >
-                            Contact Us
-                        </Link>
 
                         {/* Sign In Dropdown */}
                         <div className="relative">
@@ -54,21 +48,21 @@ export default function Navbar() {
                             {signInOpen && (
                                 <div className="absolute right-0 mt-2 w-52 bg-slate-800 rounded-xl shadow-xl border border-slate-700 py-1 z-50">
                                     <Link
-                                        href="/signin"
+                                        href="/login?role=user"
                                         className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-slate-200 hover:bg-amber-900/20 hover:text-amber-400 transition-colors"
                                         onClick={() => setSignInOpen(false)}
                                     >
                                         <span className="text-base">👤</span> Sign in as User
                                     </Link>
                                     <Link
-                                        href="/driver/login"
+                                        href="/login?role=driver"
                                         className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-slate-200 hover:bg-blue-900/20 hover:text-blue-400 transition-colors"
                                         onClick={() => setSignInOpen(false)}
                                     >
                                         <span className="text-base">🛺</span> Sign in as Rickshaw Driver
                                     </Link>
                                     <Link
-                                        href="/login"
+                                        href="/login?role=admin"
                                         className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-slate-200 hover:bg-purple-900/20 hover:text-purple-400 transition-colors"
                                         onClick={() => setSignInOpen(false)}
                                     >
@@ -91,7 +85,7 @@ export default function Navbar() {
                             {registerOpen && (
                                 <div className="absolute right-0 mt-2 w-56 bg-slate-800 rounded-xl shadow-xl border border-slate-700 py-1 z-50">
                                     <Link
-                                        href="/register"
+                                        href="/register/user"
                                         className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-slate-200 hover:bg-amber-900/20 hover:text-amber-400 transition-colors"
                                         onClick={() => setRegisterOpen(false)}
                                     >
@@ -154,30 +148,23 @@ export default function Navbar() {
                         >
                             About Us
                         </Link>
-                        <Link
-                            href="/contact"
-                            className="block px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-800 rounded-lg"
-                            onClick={() => setIsOpen(false)}
-                        >
-                            Contact Us
-                        </Link>
                         <div className="px-4 py-1 text-xs font-semibold text-slate-400 uppercase tracking-wider">Sign In As</div>
                         <Link
-                            href="/signin"
+                            href="/login?role=user"
                             className="block px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-800 rounded-lg"
                             onClick={() => setIsOpen(false)}
                         >
                             👤 User
                         </Link>
                         <Link
-                            href="/driver/login"
+                            href="/login?role=driver"
                             className="block px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-800 rounded-lg"
                             onClick={() => setIsOpen(false)}
                         >
                             🛺 Rickshaw Driver
                         </Link>
                         <Link
-                            href="/login"
+                            href="/login?role=admin"
                             className="block px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-800 rounded-lg"
                             onClick={() => setIsOpen(false)}
                         >
@@ -185,7 +172,7 @@ export default function Navbar() {
                         </Link>
                         <div className="px-4 py-1 text-xs font-semibold text-slate-400 uppercase tracking-wider">Register As</div>
                         <Link
-                            href="/register"
+                            href="/register/user"
                             className="block px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-800 rounded-lg"
                             onClick={() => setIsOpen(false)}
                         >

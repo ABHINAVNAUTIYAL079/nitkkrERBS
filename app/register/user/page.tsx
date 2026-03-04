@@ -68,8 +68,9 @@ export default function RegisterUserPage() {
             } else {
                 toast.success("OTP sent to your email address!");
             }
-        } catch { toast.error("Network error. Please try again."); }
-        finally { setLoading(false); }
+        } catch (err) {
+            toast.error(err instanceof TypeError ? "Network error. Please check your connection." : "Something went wrong. Please try again.");
+        } finally { setLoading(false); }
     };
 
     const handleVerifyOtp = async (e: React.FormEvent) => {
@@ -86,8 +87,9 @@ export default function RegisterUserPage() {
             if (!res.ok) { toast.error(data.message || "OTP verification failed"); return; }
             toast.success("🎉 Account verified! Welcome aboard!");
             window.location.href = "/dashboard";
-        } catch { toast.error("Network error. Please try again."); }
-        finally { setLoading(false); }
+        } catch (err) {
+            toast.error(err instanceof TypeError ? "Network error. Please check your connection." : "Something went wrong. Please try again.");
+        } finally { setLoading(false); }
     };
 
     return (
@@ -240,7 +242,7 @@ export default function RegisterUserPage() {
 
                     <p className="text-center text-sm text-slate-400 mt-5 pt-5 border-t border-slate-800">
                         Already have an account?{" "}
-                        <Link href="/signin" className="text-emerald-400 hover:text-emerald-300 font-medium">
+                        <Link href="/login" className="text-emerald-400 hover:text-emerald-300 font-medium">
                             Sign In <ArrowRight className="inline w-3.5 h-3.5" />
                         </Link>
                     </p>

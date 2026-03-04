@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { MapPin, Clock, Shield, Leaf, ArrowRight, LogIn, UserPlus, X } from "lucide-react";
+import { MapPin, Clock, Shield, Leaf, ArrowRight, LogIn, UserPlus } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Spinner } from "@/components/ui";
@@ -18,8 +18,6 @@ const KurukshetraMap = dynamic(() => import("@/components/KurukshetraMap"), {
 
 export default function HomePage() {
     const [checking, setChecking] = useState(true);
-    const [signInModal, setSignInModal] = useState(false);
-    const [registerModal, setRegisterModal] = useState(false);
 
     useEffect(() => {
         // If user is already logged in as a student, redirect to dashboard
@@ -90,130 +88,24 @@ export default function HomePage() {
 
                         {/* CTA Buttons */}
                         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                            <button
-                                onClick={() => { setSignInModal(true); setRegisterModal(false); }}
+                            <Link
+                                href="/login"
                                 className="flex items-center justify-center gap-2.5 px-8 py-3.5 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-slate-900 font-bold rounded-2xl shadow-xl shadow-amber-500/30 transition-all hover:scale-105 text-base"
                             >
                                 <LogIn className="w-5 h-5" /> Sign In
-                            </button>
-                            <button
-                                onClick={() => { setRegisterModal(true); setSignInModal(false); }}
+                            </Link>
+                            <Link
+                                href="/register"
                                 className="flex items-center justify-center gap-2.5 px-8 py-3.5 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold rounded-2xl transition-all hover:scale-105 text-base backdrop-blur-sm"
                             >
                                 <UserPlus className="w-5 h-5" /> Create Account
-                            </button>
+                            </Link>
                         </div>
                     </div>
                 </div>
             </section>
 
-            {/* Sign In Role Chooser Modal */}
-            {signInModal && (
-                <div
-                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4"
-                    onClick={() => setSignInModal(false)}
-                >
-                    <div
-                        className="bg-slate-800 rounded-2xl shadow-2xl w-full max-w-sm p-6 relative"
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <button
-                            onClick={() => setSignInModal(false)}
-                            className="absolute top-4 right-4 text-slate-400 hover:text-slate-200 transition-colors"
-                        >
-                            <X className="w-5 h-5" />
-                        </button>
-                        <h2 className="text-xl font-bold text-white mb-1">Sign In</h2>
-                        <p className="text-sm text-slate-400 mb-5">Choose how you want to sign in</p>
-                        <div className="space-y-3">
-                            <Link
-                                href="/signin"
-                                onClick={() => setSignInModal(false)}
-                                className="flex items-center gap-3 px-4 py-3.5 rounded-xl border border-slate-700 hover:bg-amber-900/20 hover:border-amber-700 transition-all group"
-                            >
-                                <span className="text-2xl">👤</span>
-                                <div>
-                                    <p className="font-semibold text-white text-sm group-hover:text-amber-400">Sign in as User</p>
-                                    <p className="text-xs text-slate-400">Student / Staff</p>
-                                </div>
-                                <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-amber-500 ml-auto" />
-                            </Link>
-                            <Link
-                                href="/driver/login"
-                                onClick={() => setSignInModal(false)}
-                                className="flex items-center gap-3 px-4 py-3.5 rounded-xl border border-slate-700 hover:bg-blue-900/20 hover:border-blue-700 transition-all group"
-                            >
-                                <span className="text-2xl">🛺</span>
-                                <div>
-                                    <p className="font-semibold text-white text-sm group-hover:text-blue-400">Sign in as Rickshaw Driver</p>
-                                    <p className="text-xs text-slate-400">Registered drivers</p>
-                                </div>
-                                <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-blue-600 ml-auto" />
-                            </Link>
-                            <Link
-                                href="/login"
-                                onClick={() => setSignInModal(false)}
-                                className="flex items-center gap-3 px-4 py-3.5 rounded-xl border border-slate-700 hover:bg-purple-900/20 hover:border-purple-700 transition-all group"
-                            >
-                                <span className="text-2xl">🔐</span>
-                                <div>
-                                    <p className="font-semibold text-white text-sm group-hover:text-purple-400">Sign in as Admin</p>
-                                    <p className="text-xs text-slate-400">System administrators</p>
-                                </div>
-                                <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-purple-600 ml-auto" />
-                            </Link>
-                        </div>
-                    </div>
-                </div>
-            )}
 
-            {/* Register Role Chooser Modal */}
-            {registerModal && (
-                <div
-                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4"
-                    onClick={() => setRegisterModal(false)}
-                >
-                    <div
-                        className="bg-slate-800 rounded-2xl shadow-2xl w-full max-w-sm p-6 relative"
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <button
-                            onClick={() => setRegisterModal(false)}
-                            className="absolute top-4 right-4 text-slate-400 hover:text-slate-200 transition-colors"
-                        >
-                            <X className="w-5 h-5" />
-                        </button>
-                        <h2 className="text-xl font-bold text-white mb-1">Create Account</h2>
-                        <p className="text-sm text-slate-400 mb-5">Choose how you want to register</p>
-                        <div className="space-y-3">
-                            <Link
-                                href="/register"
-                                onClick={() => setRegisterModal(false)}
-                                className="flex items-center gap-3 px-4 py-3.5 rounded-xl border border-slate-700 hover:bg-amber-900/20 hover:border-amber-700 transition-all group"
-                            >
-                                <span className="text-2xl">👤</span>
-                                <div>
-                                    <p className="font-semibold text-white text-sm group-hover:text-amber-400">Register as User</p>
-                                    <p className="text-xs text-slate-400">Student / Staff account</p>
-                                </div>
-                                <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-amber-500 ml-auto" />
-                            </Link>
-                            <Link
-                                href="/driver/register"
-                                onClick={() => setRegisterModal(false)}
-                                className="flex items-center gap-3 px-4 py-3.5 rounded-xl border border-slate-700 hover:bg-blue-900/20 hover:border-blue-700 transition-all group"
-                            >
-                                <span className="text-2xl">🛺</span>
-                                <div>
-                                    <p className="font-semibold text-white text-sm group-hover:text-blue-400">Register as Rickshaw Driver</p>
-                                    <p className="text-xs text-slate-400">Join as a driver</p>
-                                </div>
-                                <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-blue-600 ml-auto" />
-                            </Link>
-                        </div>
-                    </div>
-                </div>
-            )}
 
             {/* Map preview */}
             <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">

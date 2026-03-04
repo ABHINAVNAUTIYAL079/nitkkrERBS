@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import Link from "next/link";
 import {
@@ -8,6 +8,7 @@ import {
     ShieldCheck, Truck, UserCircle, ArrowRight
 } from "lucide-react";
 import { Spinner } from "@/components/ui";
+import { useEffect } from "react";
 
 type Role = "user" | "driver" | "admin";
 
@@ -19,12 +20,21 @@ const ROLES = [
 
 export default function UnifiedLoginPage() {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const [role, setRole] = useState<Role>("user");
+
+    useEffect(() => {
+        const queryRole = searchParams.get("role") as Role;
+        if (queryRole && ROLES.some(r => r.id === queryRole)) {
+            setRole(queryRole);
+        }
+    }, [searchParams]);
+
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
 
-    // User form (phone-based booking lookup)
-    const [userPhone, setUserPhone] = useState("");
+    // ── User login ──
+    const [userForm, setUserForm] = useState({ phone: "", password: "" });
 
     // Driver form
     const [driverForm, setDriverForm] = useState({ phone: "", password: "" });
@@ -34,14 +44,26 @@ export default function UnifiedLoginPage() {
 
     const activeRole = ROLES.find((r) => r.id === role)!;
 
-    // ── User: just redirect to booking page ──
-    const handleUserContinue = (e: React.FormEvent) => {
+    // ── User login ──
+    const handleUserLogin = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!/^\d{10}$/.test(userPhone)) {
+        if (!/^\d{10}$/.test(userForm.phone)) {
             toast.error("Enter a valid 10-digit phone number");
             return;
         }
-        router.push(`/bookings?phone=${userPhone}`);
+        setLoading(true);
+        try {
+            const res = await fetch("/api/auth/user/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(userForm),
+            });
+            const data = await res.json();
+            if (!res.ok) { toast.error(data.message || "Login failed"); return; }
+            toast.success(`Welcome back, ${data.user.name}!`);
+            window.location.href = "/dashboard";
+        } catch (err) { toast.error(err instanceof TypeError ? "Network error. Please check your connection." : "Something went wrong. Please try again."); }
+        finally { setLoading(false); }
     };
 
     // ── Driver login ──
@@ -59,7 +81,7 @@ export default function UnifiedLoginPage() {
             toast.success(`Welcome, ${data.user.name}!`);
             // Use hard navigation so the auth cookie is sent with the middleware request
             window.location.href = "/driver/dashboard";
-        } catch { toast.error("Network error"); }
+        } catch (err) { toast.error(err instanceof TypeError ? "Network error. Please check your connection." : "Something went wrong. Please try again."); }
         finally { setLoading(false); }
     };
 
@@ -78,7 +100,7 @@ export default function UnifiedLoginPage() {
             toast.success(`Welcome, ${data.user.name}!`);
             // Use hard navigation so the auth cookie is sent with the middleware request
             window.location.href = "/admin/drivers";
-        } catch { toast.error("Network error"); }
+        } catch (err) { toast.error(err instanceof TypeError ? "Network error. Please check your connection." : "Something went wrong. Please try again."); }
         finally { setLoading(false); }
     };
 
@@ -132,39 +154,62 @@ export default function UnifiedLoginPage() {
                                     <UserCircle className="w-5 h-5 text-white" />
                                 </div>
                                 <div>
-                                    <h2 className="font-bold text-slate-800 dark:text-white">Book a Ride</h2>
-                                    <p className="text-xs text-slate-500 dark:text-slate-400">No account needed</p>
+                                    <h2 className="font-bold text-slate-800 dark:text-white">User Login</h2>
+                                    <p className="text-xs text-slate-500 dark:text-slate-400">Sign in to book rides</p>
                                 </div>
                             </div>
 
-                            <form onSubmit={handleUserContinue} className="space-y-4">
+                            <form onSubmit={handleUserLogin} className="space-y-4">
                                 <div>
-                                    <label className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1.5">Your Phone Number</label>
+                                    <label className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1.5">Phone Number</label>
                                     <div className="relative">
                                         <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                         <input
                                             type="tel"
                                             maxLength={10}
                                             required
-                                            value={userPhone}
-                                            onChange={(e) => setUserPhone(e.target.value.replace(/\D/g, ""))}
+                                            value={userForm.phone}
+                                            onChange={(e) => setUserForm({ ...userForm, phone: e.target.value.replace(/\D/g, "") })}
                                             placeholder="10-digit mobile number"
                                             className={`w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-xl text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 ${ring} text-sm`}
                                         />
                                     </div>
                                 </div>
+                                <div>
+                                    <div className="flex items-center justify-between mb-1.5">
+                                        <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">Password</label>
+                                        <Link href="/forgot-password" className="text-xs text-green-500 hover:text-green-400">
+                                            Forgot Password?
+                                        </Link>
+                                    </div>
+                                    <div className="relative">
+                                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                        <input
+                                            type={showPassword ? "text" : "password"}
+                                            required
+                                            value={userForm.password}
+                                            onChange={(e) => setUserForm({ ...userForm, password: e.target.value })}
+                                            placeholder="Enter your password"
+                                            className={`w-full pl-10 pr-10 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-xl text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 ${ring} text-sm`}
+                                        />
+                                        <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
+                                            {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                        </button>
+                                    </div>
+                                </div>
                                 <button
                                     type="submit"
-                                    className="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold rounded-xl transition-all shadow-lg hover:shadow-green-500/30"
+                                    disabled={loading}
+                                    className="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold rounded-xl transition-all shadow-lg hover:shadow-green-500/30 disabled:opacity-60"
                                 >
-                                    View My Bookings <ArrowRight className="w-4 h-4" />
+                                    {loading ? <Spinner size="sm" /> : <><UserCircle className="w-4 h-4" /> Sign In as User</>}
                                 </button>
-                                <Link
-                                    href="/"
-                                    className="flex items-center justify-center gap-2 py-3 bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 font-semibold rounded-xl border border-green-200 dark:border-green-800 hover:bg-green-100 transition-colors text-sm"
-                                >
-                                    <img src="/logo.png" alt="Logo" className="w-4 h-4 rounded object-cover" /> Book a New Ride
-                                </Link>
+                                <p className="text-center text-xs text-slate-500 dark:text-slate-400">
+                                    New student?{" "}
+                                    <Link href="/register" className="text-green-500 hover:underline font-medium">
+                                        Create Account
+                                    </Link>
+                                </p>
                             </form>
                         </>
                     )}

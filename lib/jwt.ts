@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 
-const JWT_SECRET = process.env.JWT_SECRET!;
+const JWT_SECRET = process.env.JWT_SECRET || "nitkkr_erickshaw_jwt_secret_key_2024_secure";
 
 export interface JWTPayload {
     id: string;

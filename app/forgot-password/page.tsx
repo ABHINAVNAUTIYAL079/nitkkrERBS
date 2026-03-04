@@ -75,7 +75,7 @@ export default function ForgotPasswordPage() {
             const data = await res.json();
             if (!res.ok) { toast.error(data.message || "Reset failed"); return; }
             toast.success("Password reset successfully! Please sign in.");
-            window.location.href = "/signin";
+            window.location.href = "/login";
         } catch { toast.error("Network error."); }
         finally { setLoading(false); }
     };
@@ -193,7 +193,7 @@ export default function ForgotPasswordPage() {
 
                     <p className="text-center text-sm text-slate-400 mt-5 pt-5 border-t border-slate-800">
                         Remembered it?{" "}
-                        <Link href="/signin" className="text-emerald-400 hover:text-emerald-300 font-medium">Sign In</Link>
+                        <Link href="/login" className="text-emerald-400 hover:text-emerald-300 font-medium">Sign In</Link>
                     </p>
                 </div>
             </div>

@@ -7,11 +7,11 @@ export async function POST(req: NextRequest) {
     try {
         await connectDB();
 
-        const { name, phone, password, rickshawNumber, nitRegistrationId } =
+        const { name, phone, password, rickshawNumber } =
             await req.json();
 
         // Validate required fields
-        if (!name || !phone || !password || !rickshawNumber || !nitRegistrationId) {
+        if (!name || !phone || !password || !rickshawNumber) {
             return NextResponse.json(
                 { message: "All fields are required." },
                 { status: 400 }
@@ -52,14 +52,7 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        // Check if NIT registration ID already registered
-        const existingNIT = await Driver.findOne({ nitRegistrationId });
-        if (existingNIT) {
-            return NextResponse.json(
-                { message: "This NIT Registration ID is already registered." },
-                { status: 409 }
-            );
-        }
+
 
         // Hash password
         const hashedPassword = await bcrypt.hash(password, 12);
@@ -70,7 +63,7 @@ export async function POST(req: NextRequest) {
             phone,
             password: hashedPassword,
             rickshawNumber: rickshawNumber.trim().toUpperCase(),
-            nitRegistrationId: nitRegistrationId.trim(),
+
             status: "pending",
             isAvailable: false,
         });

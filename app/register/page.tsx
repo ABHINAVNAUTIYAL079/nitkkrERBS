@@ -81,7 +81,7 @@ export default function RegisterSelectPage() {
                 {/* Footer */}
                 <p className="text-center text-sm text-slate-400 mt-8">
                     Already have an account?{" "}
-                    <Link href="/signin" className="text-emerald-400 hover:text-emerald-300 font-medium">
+                    <Link href="/login" className="text-emerald-400 hover:text-emerald-300 font-medium">
                         Sign In <ArrowRight className="inline w-3.5 h-3.5" />
                     </Link>
                 </p>
