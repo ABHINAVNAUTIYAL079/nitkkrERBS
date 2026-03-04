@@ -4,6 +4,12 @@ import { useEffect, useRef } from "react";
 // NIT KKR campus centre
 const NIT_KKR = { lat: 29.9470, lng: 76.8180 };
 
+// Kurukshetra district bounding box — map cannot pan/zoom outside this
+const KKR_BOUNDS: [[number, number], [number, number]] = [
+    [29.75, 76.60], // SW corner
+    [30.15, 77.10], // NE corner
+];
+
 export interface RouteInfo {
     distanceKm: number;
     durationMin: number;
@@ -115,8 +121,12 @@ export default function KurukshetraMap({ pickupCoords, dropCoords, onRouteReady,
             const map = L.map(mapRef.current, {
                 center: [NIT_KKR.lat, NIT_KKR.lng],
                 zoom: 13,
+                minZoom: 11,
+                maxZoom: 19,
                 zoomControl: true,
                 scrollWheelZoom: true,
+                maxBounds: KKR_BOUNDS,
+                maxBoundsViscosity: 1.0, // hard stop — map won't pan outside bounds
             });
 
             L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
