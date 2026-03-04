@@ -118,8 +118,8 @@ export default function UnifiedLoginPage() {
                 {/* Logo */}
                 <div className="text-center mb-8">
                     <Link href="/" className="inline-flex items-center gap-2 justify-center mb-4">
-                        <div className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg shadow-green-500/30">
-                            <img src="/logo.png" alt="NIT KKR E-Rickshaw Logo" className="w-12 h-12 rounded-2xl object-cover" />
+                        <div className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg shadow-green-500/30">
+                            <img src="/logo.png" alt="NIT KKR E-Rickshaw Logo" className="w-16 h-16 rounded-2xl object-cover" />
                         </div>
                     </Link>
                     <h1 className="text-2xl font-bold text-slate-800 dark:text-white">NIT KKR E-Rickshaw</h1>

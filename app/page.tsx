@@ -57,7 +57,7 @@ export default function HomePage() {
                     <div className="max-w-2xl mx-auto text-center">
                         {/* Badge */}
                         <div className="inline-flex items-center gap-2 bg-amber-500/20 border border-amber-400/30 rounded-full px-4 py-1.5 mb-6">
-                            <img src="/logo.png" alt="Logo" className="w-4 h-4 rounded object-cover" />
+                            <img src="/logo.png" alt="Logo" className="w-6 h-6 rounded object-cover" />
                             <span className="text-amber-300 text-xs font-semibold tracking-wide uppercase">Zero Emission Transport</span>
                         </div>
 

@@ -8,7 +8,7 @@ export default function Footer() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     <div>
                         <div className="flex items-center gap-2 mb-3">
-                            <img src="/logo.png" alt="NIT KKR E-Rickshaw Logo" className="w-8 h-8 rounded-lg object-cover" />
+                            <img src="/logo.png" alt="NIT KKR E-Rickshaw Logo" className="w-10 h-10 rounded-lg object-cover" />
                             <span className="font-bold text-white">NIT KKR E-Rickshaw</span>
                         </div>
                         <p className="text-sm text-slate-400">

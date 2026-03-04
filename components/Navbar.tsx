@@ -15,7 +15,7 @@ export default function Navbar() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center h-16">
                     <Link href="/" className="flex items-center gap-2 group">
-                        <img src="/logo.png" alt="NIT KKR E-Rickshaw Logo" className="w-8 h-8 rounded-lg shadow-md group-hover:shadow-amber-200 transition-shadow object-cover" />
+                        <img src="/logo.png" alt="NIT KKR E-Rickshaw Logo" className="w-12 h-12 rounded-lg shadow-md group-hover:shadow-amber-200 transition-shadow object-cover" />
                         <div>
                             <span className="font-bold text-white text-sm leading-tight block">
                                 NIT KKR
