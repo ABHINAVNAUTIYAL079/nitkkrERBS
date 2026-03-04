@@ -6,8 +6,6 @@ import { useTheme } from "@/components/ThemeProvider";
 
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
-    const [signInOpen, setSignInOpen] = useState(false);
-    const [registerOpen, setRegisterOpen] = useState(false);
     const { theme, toggleTheme } = useTheme();
 
     return (
@@ -35,72 +33,21 @@ export default function Navbar() {
                             About Us
                         </Link>
 
-                        {/* Sign In Dropdown */}
-                        <div className="relative">
-                            <button
-                                onClick={() => { setSignInOpen(!signInOpen); setRegisterOpen(false); }}
-                                className="ml-2 flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-slate-900 bg-gradient-to-r from-amber-400 to-yellow-500 rounded-lg hover:shadow-md hover:shadow-amber-300/40 transition-all"
-                            >
-                                <LogIn className="w-4 h-4" />
-                                Sign In
-                                <ChevronDown className={`w-3.5 h-3.5 transition-transform ${signInOpen ? "rotate-180" : ""}`} />
-                            </button>
-                            {signInOpen && (
-                                <div className="absolute right-0 mt-2 w-52 bg-slate-800 rounded-xl shadow-xl border border-slate-700 py-1 z-50">
-                                    <Link
-                                        href="/login?role=user"
-                                        className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-slate-200 hover:bg-amber-900/20 hover:text-amber-400 transition-colors"
-                                        onClick={() => setSignInOpen(false)}
-                                    >
-                                        <span className="text-base">👤</span> Sign in as User
-                                    </Link>
-                                    <Link
-                                        href="/login?role=driver"
-                                        className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-slate-200 hover:bg-blue-900/20 hover:text-blue-400 transition-colors"
-                                        onClick={() => setSignInOpen(false)}
-                                    >
-                                        <span className="text-base">🛺</span> Sign in as Rickshaw Driver
-                                    </Link>
-                                    <Link
-                                        href="/login?role=admin"
-                                        className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-slate-200 hover:bg-purple-900/20 hover:text-purple-400 transition-colors"
-                                        onClick={() => setSignInOpen(false)}
-                                    >
-                                        <span className="text-base">🔐</span> Sign in as Admin
-                                    </Link>
-                                </div>
-                            )}
-                        </div>
+                        <Link
+                            href="/login"
+                            className="ml-2 flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-slate-900 bg-gradient-to-r from-amber-400 to-yellow-500 rounded-lg hover:shadow-md hover:shadow-amber-300/40 transition-all"
+                        >
+                            <LogIn className="w-4 h-4" />
+                            Sign In
+                        </Link>
 
-                        {/* Create Account Dropdown */}
-                        <div className="relative">
-                            <button
-                                onClick={() => { setRegisterOpen(!registerOpen); setSignInOpen(false); }}
-                                className="ml-1 flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-amber-400 border border-amber-700 rounded-lg hover:bg-amber-900/20 transition-all"
-                            >
-                                <UserPlus className="w-4 h-4" />
-                                Register
-                                <ChevronDown className={`w-3.5 h-3.5 transition-transform ${registerOpen ? "rotate-180" : ""}`} />
-                            </button>
-                            {registerOpen && (
-                                <div className="absolute right-0 mt-2 w-56 bg-slate-800 rounded-xl shadow-xl border border-slate-700 py-1 z-50">
-                                    <Link
-                                        href="/register/user"
-                                        className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-slate-200 hover:bg-amber-900/20 hover:text-amber-400 transition-colors"
-                                        onClick={() => setRegisterOpen(false)}
-                                    >
-                                        <span className="text-base">👤</span> Register as User
-                                    </Link>
-                                    <Link
-                                        href="/driver/register"
-                                        className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-slate-200 hover:bg-blue-900/20 hover:text-blue-400 transition-colors"
-                                        onClick={() => setRegisterOpen(false)}
-                                    >
-                                        <span className="text-base">🛺</span> Register as Rickshaw Driver
-                                    </Link>
-                                </div>
-                            )}
-                        </div>
+                        <Link
+                            href="/register"
+                            className="ml-1 flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-amber-400 border border-amber-700 rounded-lg hover:bg-amber-900/20 transition-all font-inter"
+                        >
+                            <UserPlus className="w-4 h-4" />
+                            Register
+                        </Link>
 
                         {/* Dark/Light Toggle */}
                         <button
@@ -148,53 +95,25 @@ export default function Navbar() {
                         >
                             About Us
                         </Link>
-                        <div className="px-4 py-1 text-xs font-semibold text-slate-400 uppercase tracking-wider">Sign In As</div>
+                        <div className="h-px bg-slate-800 my-2 mx-4" />
                         <Link
-                            href="/login?role=user"
-                            className="block px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-800 rounded-lg"
+                            href="/login"
+                            className="block px-4 py-2 text-sm font-semibold text-amber-400 hover:bg-amber-900/20 rounded-lg"
                             onClick={() => setIsOpen(false)}
                         >
-                            👤 User
+                            <LogIn className="w-4 h-4 inline mr-2" /> Sign In
                         </Link>
                         <Link
-                            href="/login?role=driver"
-                            className="block px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-800 rounded-lg"
+                            href="/register"
+                            className="block px-4 py-2 text-sm font-semibold text-slate-300 hover:bg-slate-800 rounded-lg"
                             onClick={() => setIsOpen(false)}
                         >
-                            🛺 Rickshaw Driver
-                        </Link>
-                        <Link
-                            href="/login?role=admin"
-                            className="block px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-800 rounded-lg"
-                            onClick={() => setIsOpen(false)}
-                        >
-                            🔐 Admin
-                        </Link>
-                        <div className="px-4 py-1 text-xs font-semibold text-slate-400 uppercase tracking-wider">Register As</div>
-                        <Link
-                            href="/register/user"
-                            className="block px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-800 rounded-lg"
-                            onClick={() => setIsOpen(false)}
-                        >
-                            👤 User
-                        </Link>
-                        <Link
-                            href="/driver/register"
-                            className="block px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-800 rounded-lg"
-                            onClick={() => setIsOpen(false)}
-                        >
-                            🛺 Rickshaw Driver
+                            <UserPlus className="w-4 h-4 inline mr-2" /> Register
                         </Link>
                     </div>
                 )}
             </div>
-            {/* Backdrop to close dropdowns */}
-            {(signInOpen || registerOpen) && (
-                <div
-                    className="fixed inset-0 z-40"
-                    onClick={() => { setSignInOpen(false); setRegisterOpen(false); }}
-                />
-            )}
+
         </nav>
     );
 }
