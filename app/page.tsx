@@ -2,7 +2,23 @@
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { MapPin, Clock, Shield, Leaf, ArrowRight, LogIn, UserPlus } from "lucide-react";
+import { 
+    ArrowRight, 
+    Shield, 
+    Zap, 
+    Clock, 
+    MapPin, 
+    Star, 
+    ChevronRight, 
+    CheckCircle2, 
+    ArrowUpRight,
+    Users,
+    Smartphone,
+    Award,
+    LogIn, 
+    UserPlus,
+    Leaf
+} from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Spinner } from "@/components/ui";
@@ -57,7 +73,7 @@ export default function HomePage() {
                     <div className="max-w-2xl mx-auto text-center">
                         {/* Badge */}
                         <div className="inline-flex items-center gap-2 bg-amber-500/20 border border-amber-400/30 rounded-full px-4 py-1.5 mb-6">
-                            <img src="/logo.png" alt="Logo" className="w-6 h-6 rounded object-cover" />
+                            <Zap className="w-4 h-4 text-amber-400 fill-amber-400/20" />
                             <span className="text-amber-300 text-xs font-semibold tracking-wide uppercase">Zero Emission Transport</span>
                         </div>
 
