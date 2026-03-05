@@ -135,15 +135,15 @@ export default function AdminDriversPage() {
     return (
         <div className="min-h-screen bg-slate-100">
             {/* Header */}
-            <header className="bg-white border-b border-slate-200 sticky top-0 z-10 shadow-sm">
+            <header className="bg-white border-b border-slate-200 sticky top-0 z-[1001] shadow-sm">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
                     <div className="flex items-center gap-3">
                         <div className="w-9 h-9 bg-gradient-to-br from-orange-500 to-red-600 rounded-xl flex items-center justify-center">
                             <ShieldCheck className="w-5 h-5 text-white" />
                         </div>
                         <div>
-                            <span className="font-bold text-slate-800">Driver Management</span>
-                            <span className="text-slate-400 ml-2 text-xs">Admin Panel</span>
+                            <span className="font-bold text-slate-800 text-lg">Driver Management</span>
+                            <span className="text-slate-400 ml-2 text-sm">Admin Panel</span>
                         </div>
                     </div>
                     <div className="flex items-center gap-3">

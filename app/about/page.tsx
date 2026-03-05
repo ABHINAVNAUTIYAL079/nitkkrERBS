@@ -5,7 +5,7 @@ import { Github, Linkedin, Mail } from "lucide-react";
 const teamMembers = [
     {
         name: "Ashish Kumar Pandey",
-        role: "Full Stack Developer",
+        role: "Frontend Developer",
         rollNo: "124102006",
         branch: "Computer Science & Engineering",
         year: "2nd Year",
@@ -18,7 +18,7 @@ const teamMembers = [
     },
     {
         name: "Abhinav Nautiyal",
-        role: "Frontend Developer",
+        role: "Database & Maps",
         rollNo: "124102002",
         branch: "Computer Science & Engineering",
         year: "2nd Year",
@@ -40,11 +40,11 @@ const teamMembers = [
         linkedin: "https://www.linkedin.com/in/shalendra-sen-357534339?",
         bio: "Managed database design, authentication flows, and REST API development for the platform.",
         avatar: null,
-        initials: "SHILU",
+        initials: "SS",
     },
     {
         name: "Mahesh",
-        role: "Maps & Routing Engineer",
+        role: "System Tester",
         rollNo: "124102005",
         branch: "Computer Science & Engineering",
         year: "2nd Year",
@@ -53,7 +53,7 @@ const teamMembers = [
         linkedin: "#",
         bio: "Implemented real-time campus map integration with OpenStreetMap and OSRM-based route calculation.",
         avatar: null,
-        initials: "ALLKA",
+        initials: "AM",
     },
     {
         name: "Shivam Yadav",
@@ -66,7 +66,7 @@ const teamMembers = [
         linkedin: "https://www.linkedin.com/in/shivam-yadav-544a61357/",
         bio: "Led the visual design direction, prototyping, and user research for the entire platform experience.",
         avatar: null,
-        initials: "MAGGU",
+        initials: "SY",
     },
 ];
 

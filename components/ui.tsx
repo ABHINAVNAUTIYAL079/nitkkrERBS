@@ -6,7 +6,7 @@ export function Spinner({ size = "md" }: { size?: "sm" | "md" | "lg" }) {
     };
     return (
         <div
-            className={`${sizeClasses[size]} border-green-500 border-t-transparent rounded-full animate-spin`}
+            className={`${sizeClasses[size]} border-green-500 border-t-transparent rounded-full animate-spin mx-auto block`}
         />
     );
 }

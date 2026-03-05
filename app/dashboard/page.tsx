@@ -142,15 +142,15 @@ export default function DashboardPage() {
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950">
             {/* Top bar */}
-            <header className="sticky top-0 z-50 bg-slate-900/80 backdrop-blur-xl border-b border-slate-800 px-4 py-3">
+            <header className="sticky top-0 z-[1001] bg-slate-900/80 backdrop-blur-xl border-b border-slate-800 px-4 py-3">
                 <div className="max-w-5xl mx-auto flex items-center justify-between">
                     <div className="flex items-center gap-2.5">
                         <div className="w-8 h-8 rounded-lg flex items-center justify-center">
                             <img src="/logo.png" alt="NIT KKR E-Rickshaw Logo" className="w-8 h-8 rounded-lg object-cover" />
                         </div>
                         <div>
-                            <p className="text-white font-bold text-sm leading-none">NIT KKR E-Rickshaw</p>
-                            <p className="text-slate-400 text-xs">Student Dashboard</p>
+                            <p className="text-white font-bold text-lg leading-none">NIT KKR E-Rickshaw</p>
+                            <p className="text-slate-400 text-sm">Student Dashboard</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-3">

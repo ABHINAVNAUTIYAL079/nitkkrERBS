@@ -92,7 +92,6 @@ export default function HomePage() {
                         {/* Features row */}
                         <div className="flex flex-wrap justify-center gap-5 mb-10">
                             {[
-                                { icon: Clock, text: "Real-time tracking" },
                                 { icon: Shield, text: "Safe & secure" },
                                 { icon: Leaf, text: "Eco-friendly" },
                             ].map(({ icon: Icon, text }) => (
