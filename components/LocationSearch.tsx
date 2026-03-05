@@ -21,13 +21,30 @@ interface Props {
 // NIT KURUKSHETRA CAMPUS LOCATIONS
 // ─────────────────────────────────────────────────────────────────────────────
 const CAMPUS_LOCATIONS: LocationResult[] = [
-    { label: "NIT Kurukshetra Main Gate",        lat: 29.94781, lng: 76.82241, type: "gate" },
-    { label: "NIT Market / Campus Market",       lat: 29.94888, lng: 76.81814, type: "market" },
-    { label: "Central Library, NIT Kurukshetra", lat: 29.94738, lng: 76.81538, type: "library" },
-    { label: "Sports Complex, NIT Kurukshetra",  lat: 29.95062, lng: 76.81561, type: "sports" },
-    { label: "Student Activity Center (SAC)",    lat: 29.94539, lng: 76.81824, type: "sac" },
-    { label: "Hostel 10, NIT Kurukshetra",       lat: 29.94321, lng: 76.81750, type: "hostel" },
-    { label: "MCA-MBA Department",               lat: 29.94497, lng: 76.81596, type: "department" },
+    { label: "NIT Kurukshetra Main Gate",                       lat: 29.94781, lng: 76.82241, type: "gate" },
+    { label: "NIT Market / Campus Market",                      lat: 29.94888, lng: 76.81814, type: "market" },
+    { label: "Central Library, NIT Kurukshetra",                lat: 29.94738, lng: 76.81538, type: "library" },
+    { label: "Sports Complex, NIT Kurukshetra",                 lat: 29.95062, lng: 76.81561, type: "sports" },
+    { label: "Student Activity Center (SAC)",                   lat: 29.94539, lng: 76.81824, type: "sac" },
+    { label: "Hostel 10, NIT Kurukshetra",                      lat: 29.94321, lng: 76.81750, type: "hostel" },
+    { label: "MCA-MBA Department",                              lat: 29.94497, lng: 76.81596, type: "department" },
+    { label: "Brahma Sarovar",                                  lat: 29.96887, lng: 76.83469, type: "places" },
+    { label: "Pipli Mini Zoo",                                   lat: 29.98679, lng: 76.89226, type: "zoo" },
+    { label: "Pipli Bus Stand",                                  lat: 29.98099, lng: 76.89277, type: "Bus stand" },
+    { label: "Kessel Mall",                                     lat: 29.97053, lng: 76.83636, type: "Mall" },
+    { label: "Divine Mall",                                     lat: 29.97510, lng: 76.86713, type: "Mall" },
+    { label: "Sheikh Chilli Tomb",                              lat: 29.97685, lng: 76.82794, type: "Tomb" },
+    { label: "Wine Shop Kurukshetra",                           lat: 29.97383, lng: 76.82662, type: "wine shop" },
+    { label: "Railway Station",                                 lat: 29.96672, lng: 76.82499, type: "railway station" },
+    { label: "Kurukshetra University",                          lat: 29.95634, lng: 76.81939, type: "University" },
+    { label: "Jyothisar",                                       lat: 29.96206, lng: 76.77137, type: "jyothisar" },
+    { label: "Kurukshetra Panorama & Science Centre",           lat: 29.96612, lng: 76.83384, type: "museum" },
+    { label: "Krishna Garden Park",                             lat: 29.96345, lng: 76.83720, type: "park" },
+    { label: "Shri Venkateswara Swamy Tirupati Balaji Temple",  lat: 29.95797, lng: 76.83464, type: "temple" },
+    { label: "Multi Art Cultural Centre",                       lat: 29.95693, lng: 76.83370, type: "Art Center" },
+    { label: "1857 War Museum",                                 lat: 29.96220, lng: 76.81978, type: "museum" },
+    { label: "The Dharohar Haryana Cultural Museum",            lat: 29.96153, lng: 76.81877, type: "museum" },
+    { label: "Jat Dharamshala",                                 lat: 29.96612, lng: 76.82698, type: "dharmashala" },
 ];
 
 // Nominatim fallback for "Other" searches
