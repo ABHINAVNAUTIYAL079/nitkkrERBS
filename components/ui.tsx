@@ -1,13 +1,77 @@
 export function Spinner({ size = "md" }: { size?: "sm" | "md" | "lg" }) {
-    const sizeClasses = {
-        sm: "w-4 h-4 border-2",
-        md: "w-8 h-8 border-2",
-        lg: "w-12 h-12 border-4",
-    };
+    // Tyre dimensions per size
+    const dims = { sm: 32, md: 56, lg: 80 };
+    const px = dims[size];
+    const r = px / 2; // center
+    const outerR = r - 2;       // outer tyre edge
+    const tyreW = px * 0.12;    // tyre rubber thickness
+    const rimR = outerR - tyreW; // inner rim radius
+    const hubR = px * 0.09;     // center hub
+    const spokeCount = 8;
+
+    const spokes = Array.from({ length: spokeCount }, (_, i) => {
+        const angle = (i * Math.PI * 2) / spokeCount;
+        const x1 = r + Math.cos(angle) * hubR;
+        const y1 = r + Math.sin(angle) * hubR;
+        const x2 = r + Math.cos(angle) * rimR;
+        const y2 = r + Math.sin(angle) * rimR;
+        return { x1, y1, x2, y2 };
+    });
+
     return (
-        <div
-            className={`${sizeClasses[size]} border-green-500 border-t-transparent rounded-full animate-spin mx-auto block`}
-        />
+        <svg
+            width={px}
+            height={px}
+            viewBox={`0 0 ${px} ${px}`}
+            className="animate-spin mx-auto block"
+            style={{ animationDuration: "0.9s" }}
+            aria-label="Loading"
+        >
+            {/* Outer tyre (rubber) */}
+            <circle
+                cx={r} cy={r} r={outerR}
+                fill="none"
+                stroke="#1e293b"
+                strokeWidth={tyreW}
+            />
+            {/* Tyre highlight (gives 3D feel) */}
+            <circle
+                cx={r} cy={r} r={outerR}
+                fill="none"
+                stroke="#334155"
+                strokeWidth={tyreW * 0.35}
+                strokeDasharray={`${outerR * 0.4} ${outerR * 5}`}
+                strokeDashoffset={`${outerR * 0.2}`}
+            />
+            {/* Rim ring */}
+            <circle
+                cx={r} cy={r} r={rimR}
+                fill="none"
+                stroke="#22c55e"
+                strokeWidth={px * 0.045}
+            />
+            {/* Spokes */}
+            {spokes.map((s, i) => (
+                <line
+                    key={i}
+                    x1={s.x1} y1={s.y1}
+                    x2={s.x2} y2={s.y2}
+                    stroke="#4ade80"
+                    strokeWidth={px * 0.03}
+                    strokeLinecap="round"
+                />
+            ))}
+            {/* Center hub */}
+            <circle
+                cx={r} cy={r} r={hubR}
+                fill="#22c55e"
+            />
+            {/* Center bolt */}
+            <circle
+                cx={r} cy={r} r={hubR * 0.45}
+                fill="#0f172a"
+            />
+        </svg>
     );
 }
 
