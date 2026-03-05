@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect, useRef, useCallback } from "react";
-import { MapPin, Loader2, X, Search } from "lucide-react";
+import { MapPin, X, Search, ChevronDown } from "lucide-react";
 
 export interface LocationResult {
     label: string;
@@ -17,10 +17,22 @@ interface Props {
     id?: string;
 }
 
-// Bias search around Kurukshetra/Haryana but don't restrict it
-const VIEWBOX = "76.60,29.75,77.10,30.15"; // wider box around Kurukshetra district
+// ─────────────────────────────────────────────────────────────────────────────
+// NIT KURUKSHETRA CAMPUS LOCATIONS
+// ─────────────────────────────────────────────────────────────────────────────
+const CAMPUS_LOCATIONS: LocationResult[] = [
+    { label: "NIT Kurukshetra Main Gate",        lat: 29.94781, lng: 76.82241, type: "gate" },
+    { label: "NIT Market / Campus Market",       lat: 29.94888, lng: 76.81814, type: "market" },
+    { label: "Central Library, NIT Kurukshetra", lat: 29.94738, lng: 76.81538, type: "library" },
+    { label: "Sports Complex, NIT Kurukshetra",  lat: 29.95062, lng: 76.81561, type: "sports" },
+    { label: "Student Activity Center (SAC)",    lat: 29.94539, lng: 76.81824, type: "sac" },
+    { label: "Hostel 10, NIT Kurukshetra",       lat: 29.94321, lng: 76.81750, type: "hostel" },
+    { label: "MCA-MBA Department",               lat: 29.94497, lng: 76.81596, type: "department" },
+];
 
-async function geocode(query: string): Promise<LocationResult[]> {
+// Nominatim fallback for "Other" searches
+const VIEWBOX = "76.60,29.75,77.10,30.15";
+async function searchNominatim(query: string): Promise<LocationResult[]> {
     if (!query || query.trim().length < 2) return [];
     try {
         const url = new URL("https://nominatim.openstreetmap.org/search");
@@ -28,21 +40,14 @@ async function geocode(query: string): Promise<LocationResult[]> {
         url.searchParams.set("format", "json");
         url.searchParams.set("limit", "6");
         url.searchParams.set("viewbox", VIEWBOX);
-        url.searchParams.set("bounded", "0");         // allow outside viewbox
+        url.searchParams.set("bounded", "0");
         url.searchParams.set("addressdetails", "1");
-
         const res = await fetch(url.toString(), {
             headers: { "Accept-Language": "en", "User-Agent": "NIT-KKR-ERickshaw/1.0" },
         });
         if (!res.ok) return [];
-        const data: Array<{
-            display_name: string;
-            lat: string;
-            lon: string;
-            type: string;
-            class: string;
-        }> = await res.json();
-
+        const data: Array<{ display_name: string; lat: string; lon: string; type: string; class: string }> =
+            await res.json();
         return data.map((item) => ({
             label: item.display_name,
             lat: parseFloat(item.lat),
@@ -54,58 +59,90 @@ async function geocode(query: string): Promise<LocationResult[]> {
     }
 }
 
+// Filter campus list locally
+function searchCampus(query: string): LocationResult[] {
+    if (!query || query.trim().length < 1) return CAMPUS_LOCATIONS;
+    const q = query.trim().toLowerCase();
+    return CAMPUS_LOCATIONS.filter((loc) => loc.label.toLowerCase().includes(q));
+}
+
 function getTypeIcon(type?: string): string {
     if (!type) return "📍";
     const t = type.toLowerCase();
+    if (t === "gate")       return "�";
+    if (t === "market")     return "�";
+    if (t === "library")    return "📚";
+    if (t === "sports")     return "⚽";
+    if (t === "sac")        return "�";
+    if (t === "hostel")     return "🏨";
+    if (t === "department") return "�";
     if (t.includes("rail") || t.includes("station")) return "🚉";
-    if (t.includes("bus") || t.includes("stop")) return "🚌";
-    if (t.includes("hospital") || t.includes("clinic")) return "🏥";
-    if (t.includes("school") || t.includes("university") || t.includes("college")) return "🏫";
-    if (t.includes("hotel") || t.includes("hostel")) return "🏨";
-    if (t.includes("restaurant") || t.includes("food")) return "🍽️";
-    if (t.includes("park") || t.includes("garden")) return "🌳";
-    if (t.includes("road") || t.includes("street") || t.includes("highway")) return "🛣️";
-    if (t.includes("residential") || t.includes("house")) return "🏠";
+    if (t.includes("bus"))  return "🚌";
+    if (t.includes("hospital")) return "🏥";
+    if (t.includes("road") || t.includes("highway")) return "🛣️";
     return "📍";
 }
 
-// Shorten long Nominatim labels for display
 function shortLabel(label: string, maxLen = 55): string {
     if (label.length <= maxLen) return label;
     const parts = label.split(", ");
-    // Keep first 2–3 parts which are usually the most descriptive
     return parts.slice(0, 3).join(", ") + (parts.length > 3 ? "…" : "");
 }
 
-export default function LocationSearch({ placeholder = "Search location…", value, onChange, markerColor = "green", id }: Props) {
-    const [query, setQuery] = useState(value?.label ? shortLabel(value.label) : "");
-    const [results, setResults] = useState<LocationResult[]>([]);
-    const [loading, setLoading] = useState(false);
-    const [open, setOpen] = useState(false);
+// ─── Mode: "campus" = browsing campus list | "other" = free Nominatim search ───
+type Mode = "campus" | "other";
+
+export default function LocationSearch({
+    placeholder = "Select location…",
+    value,
+    onChange,
+    markerColor = "green",
+    id,
+}: Props) {
+    const [query, setQuery]         = useState(value?.label ? shortLabel(value.label) : "");
+    const [results, setResults]     = useState<LocationResult[]>([]);
+    const [otherResults, setOtherResults] = useState<LocationResult[]>([]);
+    const [mode, setMode]           = useState<Mode>("campus");
+    const [open, setOpen]           = useState(false);
+    const [loadingOther, setLoadingOther] = useState(false);
     const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-    const inputRef = useRef<HTMLInputElement>(null);
+    const inputRef    = useRef<HTMLInputElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
 
     // Keep text in sync if external value cleared
-    useEffect(() => {
-        if (!value) setQuery("");
-    }, [value]);
+    useEffect(() => { if (!value) { setQuery(""); setMode("campus"); } }, [value]);
 
-    const search = useCallback(async (q: string) => {
-        if (q.trim().length < 2) { setResults([]); setOpen(false); return; }
-        setLoading(true);
-        const res = await geocode(q);
-        setLoading(false);
-        setResults(res);
-        setOpen(res.length > 0);
+    // Campus filter on query change
+    useEffect(() => {
+        if (mode === "campus") {
+            setResults(searchCampus(query));
+        }
+    }, [query, mode]);
+
+    // Nominatim search when in "other" mode
+    const runOtherSearch = useCallback(async (q: string) => {
+        if (q.trim().length < 2) { setOtherResults([]); return; }
+        setLoadingOther(true);
+        const res = await searchNominatim(q);
+        setLoadingOther(false);
+        setOtherResults(res);
+        setOpen(true); // ensure dropdown is visible after results arrive
     }, []);
 
     const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
         const q = e.target.value;
         setQuery(q);
-        if (value) onChange(null); // clear selection when user types again
-        if (debounceRef.current) clearTimeout(debounceRef.current);
-        debounceRef.current = setTimeout(() => search(q), 500);
+        setOpen(true); // keep dropdown open while typing
+        if (value) onChange(null);
+        if (mode === "other") {
+            if (debounceRef.current) clearTimeout(debounceRef.current);
+            debounceRef.current = setTimeout(() => runOtherSearch(q), 500);
+        }
+    };
+
+    const handleFocus = () => {
+        setOpen(true);
+        if (mode === "campus") setResults(searchCampus(query));
     };
 
     const handleSelect = (result: LocationResult) => {
@@ -113,17 +150,38 @@ export default function LocationSearch({ placeholder = "Search location…", val
         onChange(result);
         setOpen(false);
         setResults([]);
+        setOtherResults([]);
     };
 
     const handleClear = () => {
         setQuery("");
         onChange(null);
-        setResults([]);
+        setResults(CAMPUS_LOCATIONS);
+        setOtherResults([]);
+        setMode("campus");
         setOpen(false);
         inputRef.current?.focus();
     };
 
-    // Close dropdown on outside click
+    const switchToOther = () => {
+        setMode("other");
+        setQuery("");
+        onChange(null);
+        setOtherResults([]);
+        setOpen(true);
+        setTimeout(() => inputRef.current?.focus(), 50);
+    };
+
+    const switchToCampus = () => {
+        setMode("campus");
+        setQuery("");
+        onChange(null);
+        setResults(CAMPUS_LOCATIONS);
+        setOpen(true);
+        setTimeout(() => inputRef.current?.focus(), 50);
+    };
+
+    // Close on outside click
     useEffect(() => {
         function onClickOutside(e: MouseEvent) {
             if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
@@ -134,14 +192,34 @@ export default function LocationSearch({ placeholder = "Search location…", val
         return () => document.removeEventListener("mousedown", onClickOutside);
     }, []);
 
-    const ringColor = markerColor === "green"
+    const ringColor  = markerColor === "green"
         ? "focus:ring-emerald-500 focus:border-emerald-500"
         : "focus:ring-red-500 focus:border-red-500";
+    const pinColor   = markerColor === "green" ? "text-emerald-400" : "text-red-400";
+    const accentText = markerColor === "green" ? "text-emerald-400" : "text-red-400";
 
-    const pinColor = markerColor === "green" ? "text-emerald-400" : "text-red-400";
+    const campusResults = mode === "campus" ? results : [];
+    const showOtherResults = mode === "other" && otherResults.length > 0;
+    const showDropdown = open;
 
     return (
         <div ref={containerRef} className="relative" id={id}>
+            {/* Mode badge */}
+            {mode === "other" && (
+                <div className="flex items-center gap-1.5 mb-1.5">
+                    <span className="text-xs text-amber-400 bg-amber-400/10 border border-amber-400/30 rounded-full px-2 py-0.5">
+                        🔍 Searching outside campus
+                    </span>
+                    <button
+                        type="button"
+                        onClick={switchToCampus}
+                        className="text-xs text-slate-400 hover:text-slate-200 underline transition-colors"
+                    >
+                        ← Back to campus
+                    </button>
+                </div>
+            )}
+
             {/* Input */}
             <div className="relative flex items-center">
                 <MapPin className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${pinColor} pointer-events-none z-10 shrink-0`} />
@@ -150,56 +228,105 @@ export default function LocationSearch({ placeholder = "Search location…", val
                     type="text"
                     value={query}
                     onChange={handleInput}
-                    onFocus={() => { if (results.length > 0) setOpen(true); }}
-                    placeholder={placeholder}
+                    onFocus={handleFocus}
+                    placeholder={mode === "other" ? "Type any location to search…" : placeholder}
                     autoComplete="off"
                     className={`w-full pl-9 pr-9 py-2.5 bg-slate-800/60 border border-slate-700 rounded-xl text-white text-sm placeholder-slate-500 focus:outline-none focus:ring-2 transition-colors ${ringColor}`}
                 />
                 <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
-                    {loading && <Loader2 className="w-3.5 h-3.5 text-slate-400 animate-spin" />}
-                    {!loading && query && (
-                        <button onClick={handleClear} className="text-slate-500 hover:text-slate-300 transition-colors">
+                    {loadingOther && (
+                        <svg className="w-3.5 h-3.5 text-slate-400 animate-spin" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                        </svg>
+                    )}
+                    {!loadingOther && value && (
+                        <button onClick={handleClear} type="button" className="text-slate-500 hover:text-slate-300 transition-colors">
                             <X className="w-3.5 h-3.5" />
                         </button>
                     )}
-                    {!loading && !query && <Search className="w-3.5 h-3.5 text-slate-500" />}
+                    {!loadingOther && !value && (
+                        <ChevronDown className={`w-3.5 h-3.5 ${pinColor} transition-transform ${open ? "rotate-180" : ""}`} />
+                    )}
                 </div>
             </div>
 
             {/* Selected badge */}
             {value && (
-                <div className={`mt-1.5 flex items-center gap-1.5 text-xs ${markerColor === "green" ? "text-emerald-400" : "text-red-400"}`}>
+                <div className={`mt-1.5 flex items-center gap-1.5 text-xs ${accentText}`}>
                     <span className="w-1.5 h-1.5 rounded-full bg-current inline-block animate-pulse" />
                     <span className="truncate opacity-80">{shortLabel(value.label, 50)}</span>
                 </div>
             )}
 
             {/* Dropdown */}
-            {open && results.length > 0 && (
-                <div className="absolute z-[9999] mt-1 w-full bg-slate-800 border border-slate-600 rounded-xl shadow-2xl overflow-hidden">
-                    {results.map((r, i) => (
-                        <button
-                            key={i}
-                            onMouseDown={(e) => { e.preventDefault(); handleSelect(r); }}
-                            className="w-full flex items-start gap-3 px-4 py-3 hover:bg-slate-700 transition-colors text-left group border-b border-slate-700/50 last:border-none"
-                        >
-                            <span className="text-lg shrink-0 mt-0.5">{getTypeIcon(r.type)}</span>
-                            <div className="flex-1 min-w-0">
-                                <p className="text-white text-xs font-medium leading-snug line-clamp-2">
-                                    {shortLabel(r.label, 80)}
-                                </p>
-                                {r.type && (
-                                    <p className="text-slate-500 text-xs mt-0.5 capitalize">{r.type.replace("_", " ")}</p>
-                                )}
-                            </div>
-                        </button>
-                    ))}
-                </div>
-            )}
+            {showDropdown && (
+                <div className="absolute z-[9999] mt-1 w-full bg-slate-800 border border-slate-600 rounded-xl shadow-2xl overflow-y-auto max-h-64">
 
-            {open && !loading && results.length === 0 && query.trim().length >= 2 && (
-                <div className="absolute z-[9999] mt-1 w-full bg-slate-800 border border-slate-600 rounded-xl shadow-2xl px-4 py-3 text-slate-400 text-xs">
-                    No results found. Try a different search term.
+                    {/* Campus list */}
+                    {mode === "campus" && (
+                        <>
+                            {campusResults.length > 0 ? (
+                                <>
+                                    <div className="px-3 pt-2 pb-1">
+                                        <p className="text-xs text-slate-500 font-medium uppercase tracking-wider">Campus Locations</p>
+                                    </div>
+                                    {campusResults.map((r, i) => (
+                                        <button
+                                            key={i}
+                                            type="button"
+                                            onMouseDown={(e) => { e.preventDefault(); handleSelect(r); }}
+                                            className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-slate-700 transition-colors text-left border-b border-slate-700/50 last:border-none"
+                                        >
+                                            <span className="text-base shrink-0">{getTypeIcon(r.type)}</span>
+                                            <span className="text-white text-xs font-medium truncate">{r.label}</span>
+                                        </button>
+                                    ))}
+                                </>
+                            ) : (
+                                <div className="px-4 py-3 text-slate-400 text-xs">No campus location matches.</div>
+                            )}
+
+                            {/* Other option always at the bottom */}
+                            <button
+                                type="button"
+                                onMouseDown={(e) => { e.preventDefault(); switchToOther(); }}
+                                className="w-full flex items-center gap-3 px-4 py-3 bg-slate-700/50 hover:bg-slate-600/60 transition-colors text-left border-t border-slate-600"
+                            >
+                                <span className="text-base shrink-0">🔍</span>
+                                <div>
+                                    <p className="text-amber-300 text-xs font-semibold">Other location…</p>
+                                    <p className="text-slate-400 text-xs">Search any place outside campus</p>
+                                </div>
+                            </button>
+                        </>
+                    )}
+
+                    {/* Nominatim results when in "other" mode */}
+                    {mode === "other" && (
+                        <>
+                            {query.trim().length < 2 && !loadingOther && (
+                                <div className="px-4 py-3 text-slate-400 text-xs">Start typing to search any location…</div>
+                            )}
+                            {showOtherResults && otherResults.map((r, i) => (
+                                <button
+                                    key={i}
+                                    type="button"
+                                    onMouseDown={(e) => { e.preventDefault(); handleSelect(r); }}
+                                    className="w-full flex items-start gap-3 px-4 py-3 hover:bg-slate-700 transition-colors text-left border-b border-slate-700/50 last:border-none"
+                                >
+                                    <span className="text-base shrink-0 mt-0.5">{getTypeIcon(r.type)}</span>
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-white text-xs font-medium leading-snug line-clamp-2">{shortLabel(r.label, 80)}</p>
+                                        {r.type && <p className="text-slate-500 text-xs mt-0.5 capitalize">{r.type.replace("_", " ")}</p>}
+                                    </div>
+                                </button>
+                            ))}
+                            {mode === "other" && !loadingOther && query.trim().length >= 2 && otherResults.length === 0 && (
+                                <div className="px-4 py-3 text-slate-400 text-xs">No results found. Try a different search term.</div>
+                            )}
+                        </>
+                    )}
                 </div>
             )}
         </div>
