@@ -4,6 +4,8 @@ import Admin from "@/models/Admin";
 import Location from "@/models/Location";
 import bcrypt from "bcryptjs";
 
+export const dynamic = "force-dynamic";
+
 const campusLocations = [
     { name: "Main Gate", description: "NIT KKR Main Entrance Gate", isActive: true },
     { name: "Boys Hostel Block A", description: "Block A - Ground Floor", isActive: true },
