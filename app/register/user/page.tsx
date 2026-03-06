@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import toast from "react-hot-toast";
-import { User, Phone, Mail, Lock, Eye, EyeOff, ArrowRight, ShieldCheck, ArrowLeft } from "lucide-react";
+import { User, Phone, Mail, Lock, Eye, EyeOff, ArrowRight, ShieldCheck } from "lucide-react";
 import { Spinner } from "@/components/ui";
 
 type Step = "form" | "otp";
@@ -101,13 +101,7 @@ export default function RegisterUserPage() {
             </div>
 
             <div className="relative w-full max-w-md">
-                {/* Back link */}
-                <Link
-                    href="/register"
-                    className="inline-flex items-center gap-1.5 text-slate-400 hover:text-white text-sm mb-6 transition-colors"
-                >
-                    <ArrowLeft className="w-4 h-4" /> Back to account options
-                </Link>
+
 
                 {/* Header */}
                 <div className="text-center mb-8">

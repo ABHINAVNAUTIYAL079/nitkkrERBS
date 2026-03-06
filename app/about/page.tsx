@@ -80,11 +80,13 @@ const avatarColors = [
 
 export default function AboutPage() {
     return (
-        <div className="flex flex-col min-h-screen bg-slate-950">
+        <div className="flex flex-col min-h-screen">
             <Navbar />
 
             {/* Hero */}
-            <section className="relative bg-gradient-to-br from-slate-950 via-amber-950/20 to-slate-950 text-white py-20 px-4 text-center overflow-hidden">
+            <section className="relative text-white py-20 px-4 text-center overflow-hidden">
+                {/* Dark scrim so white text is always readable */}
+                <div className="absolute inset-0 bg-gradient-to-br from-slate-950/95 via-amber-950/40 to-slate-950/90" />
                 <div className="absolute inset-0 pointer-events-none">
                     <div className="absolute top-0 left-1/4 w-72 h-72 bg-amber-500/10 rounded-full blur-3xl" />
                     <div className="absolute bottom-0 right-1/4 w-56 h-56 bg-yellow-400/8 rounded-full blur-3xl" />
@@ -108,10 +110,10 @@ export default function AboutPage() {
 
             {/* Mission */}
             <section className="max-w-4xl mx-auto px-4 py-12 text-center">
-                <div className="bg-slate-800/60 border border-amber-700/30 rounded-2xl p-8 backdrop-blur-sm">
+                <div className="theme-card rounded-2xl p-8">
                     <div className="text-3xl mb-3">🛺</div>
-                    <h2 className="text-xl font-bold text-white mb-3">Our Mission</h2>
-                    <p className="text-slate-300 text-sm leading-relaxed">
+                    <h2 className="text-xl font-bold theme-text mb-3">Our Mission</h2>
+                    <p className="text-sm theme-subtext leading-relaxed">
                         We built this platform as a semester project to solve a real problem on campus —
                         the lack of a simple, organized way to book e-rickshaw rides. Our goal is to reduce
                         waiting times, minimize manual coordination, and promote sustainable zero-emission
@@ -136,7 +138,7 @@ export default function AboutPage() {
                     {teamMembers.map((member, idx) => (
                         <div
                             key={member.name}
-                            className="bg-slate-800/70 border border-slate-700 hover:border-amber-600/50 rounded-2xl p-6 flex flex-col items-center text-center transition-all hover:shadow-lg hover:shadow-amber-900/20 group"
+                            className="theme-card hover:border-amber-600/50 rounded-2xl p-6 flex flex-col items-center text-center transition-all hover:shadow-lg hover:shadow-amber-900/20 group"
                         >
                             {/* Passport-size Avatar */}
                             <div className="mb-4">
@@ -150,7 +152,7 @@ export default function AboutPage() {
                             </div>
 
                             {/* Details */}
-                            <h3 className="text-lg font-bold text-white mb-0.5">{member.name}</h3>
+                            <h3 className="text-lg font-bold theme-text mb-0.5">{member.name}</h3>
                             <span className="inline-block bg-amber-500/15 text-amber-300 text-xs font-semibold px-2.5 py-0.5 rounded-full mb-3">
                                 {member.role}
                             </span>
@@ -211,7 +213,7 @@ export default function AboutPage() {
                     {["Next.js 14", "TypeScript", "MongoDB", "Tailwind CSS", "Leaflet Maps", "OSRM Routing", "JWT Auth", "REST APIs"].map((tech) => (
                         <span
                             key={tech}
-                            className="bg-slate-800/80 border border-slate-700 hover:border-amber-600/40 text-slate-300 text-sm px-4 py-1.5 rounded-full transition-colors hover:text-amber-300"
+                            className="theme-card text-sm px-4 py-1.5 rounded-full transition-colors hover:border-amber-600/40 theme-subtext hover:text-amber-300"
                         >
                             {tech}
                         </span>

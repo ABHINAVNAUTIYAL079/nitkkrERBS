@@ -3,13 +3,21 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 15, 23, 42;
-  --background-rgb: 248, 250, 252;
+  /* Light mode tokens */
+  --fg: 15, 23, 42;
+  --bg: 241, 245, 249;
+  --card-bg: rgba(255,255,255,0.70);
+  --card-border: rgba(0,0,0,0.08);
+  --subtext: 71, 85, 105;
 }
 
 html.dark {
-  --foreground-rgb: 248, 250, 252;
-  --background-rgb: 15, 23, 42;
+  /* Dark mode tokens */
+  --fg: 248, 250, 252;
+  --bg: 15, 23, 42;
+  --card-bg: rgba(30,41,59,0.70);
+  --card-border: rgba(255,255,255,0.07);
+  --subtext: 148, 163, 184;
 }
 
 html.dark ::-webkit-scrollbar-track {
@@ -29,9 +37,35 @@ html.dark ::-webkit-scrollbar-thumb:hover {
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background: rgb(var(--background-rgb));
+  color: rgb(var(--fg));
+  /* transparent so ThemeBackground (fixed z-0) is always visible */
+  background: transparent;
   font-family: 'Inter', sans-serif;
+}
+
+/* ── Adaptive utility classes ── */
+
+/* Card: semi-transparent, readable in both modes */
+.theme-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  backdrop-filter: blur(12px);
+}
+
+/* Primary text */
+.theme-text {
+  color: rgb(var(--fg));
+}
+
+/* Secondary / muted text */
+.theme-subtext {
+  color: rgb(var(--subtext));
+}
+
+/* Sections that need a slight opaque backing */
+.theme-section-bg {
+  background: rgba(var(--bg), 0.55);
+  backdrop-filter: blur(8px);
 }
 
 @layer utilities {

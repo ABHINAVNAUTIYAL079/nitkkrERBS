@@ -62,7 +62,9 @@ export default function HomePage() {
             <Navbar />
 
             {/* Hero Section */}
-            <section className="relative bg-gradient-to-br from-slate-950 via-amber-950/20 to-slate-950 text-white overflow-hidden min-h-[90vh] flex flex-col">
+            <section className="relative overflow-hidden min-h-[90vh] flex flex-col">
+                {/* Dark scrim so white text is always readable over any ThemeBackground */}
+                <div className="absolute inset-0 bg-gradient-to-b from-slate-950/95 via-amber-950/30 to-transparent" />
                 {/* Subtle amber glow accents */}
                 <div className="absolute inset-0 pointer-events-none">
                     <div className="absolute top-10 left-10 w-72 h-72 bg-amber-500/10 rounded-full blur-3xl" />
@@ -144,10 +146,10 @@ export default function HomePage() {
                         { icon: "🎯", title: "Easy Booking", desc: "Sign up once and book in 2 taps. No hassle." },
                         { icon: "📍", title: "Campus-Wide", desc: "Hostels, departments, mess, library, gates — all covered." },
                     ].map((f) => (
-                        <div key={f.title} className="bg-slate-800/80 backdrop-blur-sm rounded-2xl p-6 shadow-sm border border-slate-700 hover:shadow-md hover:border-amber-700/50 transition-all">
+                        <div key={f.title} className="theme-card rounded-2xl p-6 shadow-sm hover:shadow-md hover:border-amber-700/50 transition-all">
                             <div className="w-12 h-12 bg-amber-900/30 rounded-xl flex items-center justify-center text-2xl mb-4">{f.icon}</div>
-                            <h3 className="font-semibold text-white mb-2">{f.title}</h3>
-                            <p className="text-sm text-slate-400">{f.desc}</p>
+                            <h3 className="font-semibold theme-text mb-2">{f.title}</h3>
+                            <p className="text-sm theme-subtext">{f.desc}</p>
                         </div>
                     ))}
                 </div>
