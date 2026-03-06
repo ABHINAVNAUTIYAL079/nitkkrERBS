@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import Link from "next/link";
@@ -18,7 +18,7 @@ const ROLES = [
     { id: "admin" as Role, label: "Admin", icon: ShieldCheck, color: "from-orange-500 to-red-600", accent: "orange" },
 ];
 
-export default function UnifiedLoginPage() {
+function LoginContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const [role, setRole] = useState<Role>("user");
@@ -344,5 +344,13 @@ export default function UnifiedLoginPage() {
                 </p>
             </div>
         </div>
+    );
+}
+
+export default function LoginPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen" />}>
+            <LoginContent />
+        </Suspense>
     );
 }

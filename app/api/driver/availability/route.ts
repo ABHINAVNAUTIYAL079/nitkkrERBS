@@ -3,6 +3,8 @@ import dbConnect from "@/lib/db";
 import Driver from "@/models/Driver";
 import { getUserFromRequest } from "@/lib/getUser";
 
+export const dynamic = "force-dynamic";
+
 // PATCH /api/driver/availability - Toggle driver availability
 export async function PATCH(req: NextRequest) {
     try {

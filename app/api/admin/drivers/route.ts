@@ -4,6 +4,8 @@ import Driver from "@/models/Driver";
 import { hashPassword } from "@/lib/auth";
 import { getUserFromRequest } from "@/lib/getUser";
 
+export const dynamic = "force-dynamic";
+
 // GET /api/admin/drivers - List all drivers
 export async function GET(req: NextRequest) {
     try {

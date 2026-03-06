@@ -4,6 +4,8 @@ import Booking from "@/models/Booking";
 import Driver from "@/models/Driver";
 import { getUserFromRequest } from "@/lib/getUser";
 
+export const dynamic = "force-dynamic";
+
 // PATCH /api/bookings/[id] - Update booking status
 export async function PATCH(
     req: NextRequest,

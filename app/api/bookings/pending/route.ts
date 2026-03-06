@@ -3,6 +3,8 @@ import dbConnect from "@/lib/db";
 import Booking from "@/models/Booking";
 import { getUserFromRequest } from "@/lib/getUser";
 
+export const dynamic = "force-dynamic";
+
 // GET /api/bookings/pending - Pending bookings for driver dashboard
 export async function GET(req: NextRequest) {
     try {

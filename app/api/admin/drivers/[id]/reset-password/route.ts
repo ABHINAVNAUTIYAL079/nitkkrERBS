@@ -4,6 +4,8 @@ import Driver from "@/models/Driver";
 import { hashPassword } from "@/lib/auth";
 import { getUserFromRequest } from "@/lib/getUser";
 
+export const dynamic = "force-dynamic";
+
 // POST /api/admin/drivers/[id]/reset-password
 export async function POST(
     req: NextRequest,

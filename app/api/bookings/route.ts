@@ -3,6 +3,8 @@ import dbConnect from "@/lib/db";
 import Booking from "@/models/Booking";
 import { getUserFromRequest } from "@/lib/getUser";
 
+export const dynamic = "force-dynamic";
+
 function generateBookingId(): string {
     const timestamp = Date.now().toString(36).toUpperCase();
     const random = Math.random().toString(36).substring(2, 6).toUpperCase();

@@ -4,6 +4,8 @@ import Driver from "@/models/Driver";
 import { hashPassword } from "@/lib/auth";
 import { getUserFromRequest } from "@/lib/getUser";
 
+export const dynamic = "force-dynamic";
+
 // PATCH /api/admin/drivers/[id] - Approve or suspend driver
 export async function PATCH(
     req: NextRequest,
