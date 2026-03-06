@@ -60,11 +60,11 @@ export default function Footer() {
                         <ul className="space-y-2 text-sm">
                             <li className="flex items-center gap-2">
                                 <Mail className="w-4 h-4 text-amber-400" />
-                                transport@nitkkr.ac.in
+                                erickshawnitkkr@gmail.com
                             </li>
                             <li className="flex items-center gap-2">
                                 <Phone className="w-4 h-4 text-amber-400" />
-                                +91-1744-233xxx
+                                +91-9068256110,7303443491
                             </li>
                         </ul>
                     </div>
