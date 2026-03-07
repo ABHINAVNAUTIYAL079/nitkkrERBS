@@ -6,7 +6,13 @@ const DriverSchema = new Schema(
         phone: { type: String, required: true, unique: true, trim: true },
         password: { type: String, required: true },
         rickshawNumber: { type: String, required: true, unique: true, trim: true },
-        nitRegistrationId: { type: String, unique: true, sparse: true, trim: true },
+        nitRegistrationId: { 
+            type: String, 
+            unique: true, 
+            sparse: true, 
+            trim: true,
+            default: undefined // Ensure it's not even a null record
+        },
         status: {
             type: String,
             enum: ["pending", "approved", "suspended"],
