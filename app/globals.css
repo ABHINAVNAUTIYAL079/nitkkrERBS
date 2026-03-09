@@ -6,8 +6,8 @@
   /* Light mode tokens */
   --fg: 15, 23, 42;
   --bg: 241, 245, 249;
-  --card-bg: rgba(255,255,255,0.70);
-  --card-border: rgba(0,0,0,0.08);
+  --card-bg: rgba(255, 255, 255, 0.70);
+  --card-border: rgba(0, 0, 0, 0.08);
   --subtext: 71, 85, 105;
 }
 
@@ -15,8 +15,8 @@ html.dark {
   /* Dark mode tokens */
   --fg: 248, 250, 252;
   --bg: 15, 23, 42;
-  --card-bg: rgba(30,41,59,0.70);
-  --card-border: rgba(255,255,255,0.07);
+  --card-bg: rgba(30, 41, 59, 0.70);
+  --card-border: rgba(255, 255, 255, 0.07);
   --subtext: 148, 163, 184;
 }
 
@@ -209,4 +209,45 @@ body {
 
 .sunrise-glow {
   animation: glowPulse 3s ease-in-out infinite;
+}
+
+/* --- Hero staggered drop-in animation --- */
+@keyframes heroDrop {
+  0% {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-hero-drop {
+  opacity: 0;
+  animation: heroDrop 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* ── Typewriter cursor ── */
+.typewriter-cursor {
+  display: inline-block;
+  color: #f59e0b;
+  font-weight: 300;
+  animation: blink 0.7s steps(2, start) infinite;
+  margin-left: 2px;
+}
+
+@keyframes blink {
+  to {
+    opacity: 0;
+  }
+}
+
+/* Gradient text for the heading typewriter */
+.typewriter-heading {
+  background: linear-gradient(to right, #fff 0%, #fff 40%, #fbbf24 45%, #fde68a 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }

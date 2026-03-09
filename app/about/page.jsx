@@ -114,7 +114,7 @@ export default function AboutPage() {
                     <div className="text-3xl mb-3">🛺</div>
                     <h2 className="text-xl font-bold theme-text mb-3">Our Mission</h2>
                     <p className="text-sm theme-subtext leading-relaxed">
-                        We built this platform as a semester project to solve a real problem on campus —
+                        We built this platform as a  project to solve a real problem on campus —
                         the lack of a simple, organized way to book e-rickshaw rides. Our goal is to reduce
                         waiting times, minimize manual coordination, and promote sustainable zero-emission
                         transport across NIT Kurukshetra.

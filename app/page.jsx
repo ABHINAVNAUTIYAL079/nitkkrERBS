@@ -12,6 +12,7 @@ import {
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Spinner } from "@/components/ui";
+import Typewriter from "@/components/Typewriter";
 
 const KurukshetraMap = dynamic(() => import("@/components/KurukshetraMap"), {
     ssr: false,
@@ -24,6 +25,8 @@ const KurukshetraMap = dynamic(() => import("@/components/KurukshetraMap"), {
 
 export default function HomePage() {
     const [checking, setChecking] = useState(true);
+    const [headingDone, setHeadingDone] = useState(false);
+    const [subtitleDone, setSubtitleDone] = useState(false);
 
     useEffect(() => {
         // If user is already logged in as a student, redirect to dashboard
@@ -64,25 +67,33 @@ export default function HomePage() {
                 <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28">
                     <div className="max-w-2xl mx-auto text-center">
                         {/* Badge */}
-                        <div className="inline-flex items-center gap-2 bg-amber-500/20 border border-amber-400/30 rounded-full px-4 py-1.5 mb-6">
+                        <div className="inline-flex items-center gap-2 bg-amber-500/20 border border-amber-400/30 rounded-full px-4 py-1.5 mb-6 animate-hero-drop" style={{ animationDelay: '0.1s' }}>
                             <Zap className="w-4 h-4 text-amber-400 fill-amber-400/20" />
                             <span className="text-amber-300 text-xs font-semibold tracking-wide uppercase">Zero Emission Transport</span>
                         </div>
 
-                        <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-5">
-                            NIT KKR{" "}
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-300">
-                                E-Rickshaw
-                            </span>
-                            {" "}Booking
+                        <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-5 animate-hero-drop" style={{ animationDelay: '0.3s' }}>
+                            <Typewriter
+                                text="NIT KKR E-Rickshaw Booking"
+                                speed={60}
+                                delay={600}
+                                onDone={() => setHeadingDone(true)}
+                                className="typewriter-heading"
+                            />
                         </h1>
-                        <p className="text-slate-300 text-lg mb-10">
-                            Book quick, eco-friendly rides across campus in seconds.
-                            Available 24/7 for students and staff.
+                        <p className="text-slate-300 text-lg mb-10 animate-hero-drop" style={{ animationDelay: '0.55s' }}>
+                            {headingDone && (
+                                <Typewriter
+                                    text="Book quick, eco-friendly rides across campus in seconds. Available 24/7 for students and staff."
+                                    speed={30}
+                                    delay={0}
+                                    onDone={() => setSubtitleDone(true)}
+                                />
+                            )}
                         </p>
 
                         {/* Features row */}
-                        <div className="flex flex-wrap justify-center gap-5 mb-10">
+                        <div className={`flex flex-wrap justify-center gap-5 mb-10 transition-all duration-700 ${subtitleDone ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
                             {[
                                 { icon: Shield, text: "Safe & secure" },
                                 { icon: Leaf, text: "Eco-friendly" },
@@ -94,7 +105,7 @@ export default function HomePage() {
                         </div>
 
                         {/* CTA Buttons */}
-                        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                        <div className={`flex flex-col sm:flex-row gap-4 justify-center transition-all duration-700 delay-200 ${subtitleDone ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
                             <Link
                                 href="/login"
                                 className="flex items-center justify-center gap-2.5 px-8 py-3.5 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-slate-900 font-bold rounded-2xl shadow-xl shadow-amber-500/30 transition-all hover:scale-105 text-base"
