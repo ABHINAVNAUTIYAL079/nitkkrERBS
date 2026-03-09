@@ -2,13 +2,14 @@
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import Link from "next/link";
-import { CheckCircle, MapPin, ArrowLeft, Clock, IndianRupee, Users, User } from "lucide-react";
+import { CheckCircle, MapPin, ArrowLeft, Clock, IndianRupee, Users, User, Navigation } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
 function ConfirmContent() {
     const params = useSearchParams();
     const bookingId = params.get("bookingId") || "—";
+    const mongoId = params.get("id") || null;
     const name = params.get("name") || "Student";
     const fare = params.get("fare");
     const distance = params.get("distance");
@@ -69,6 +70,11 @@ function ConfirmContent() {
                     <Link href="/bookings" className="flex-1 flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold rounded-xl hover:shadow-md text-sm">
                         <MapPin className="w-4 h-4" />Track Booking</Link>
                 </div>
+                {mongoId && (
+                    <a href={`/track/${mongoId}`} className="mt-3 w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-900 font-bold rounded-xl hover:shadow-md text-sm">
+                        <Navigation className="w-4 h-4" />Track Live on Map 🗺️
+                    </a>
+                )}
             </div>
         </div>
     );

@@ -1,8 +1,8 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import { MapPin, LogOut, RefreshCw, CheckCircle, Navigation, History, Clock } from "lucide-react";
+import { MapPin, LogOut, RefreshCw, CheckCircle, Navigation, History, Clock, Key } from "lucide-react";
 import { StatusBadge, Spinner } from "@/components/ui";
 
 const STATUS_STYLES = {
@@ -24,6 +24,9 @@ export default function DriverDashboard() {
     const [refreshing, setRefreshing] = useState(false);
     const [updating, setUpdating] = useState(null);
     const [activeTab, setActiveTab] = useState("rides");
+    const [otpInput, setOtpInput] = useState("");
+    const [otpVerifying, setOtpVerifying] = useState(false);
+    const gpsIntervalRef = useRef(null);
 
     const fetchDriver = useCallback(async () => {
         const res = await fetch("/api/driver/availability");
@@ -53,6 +56,36 @@ export default function DriverDashboard() {
         return () => clearInterval(interval);
     }, [fetchAll, fetchPending]);
 
+    // GPS tracking — send driver location every 5 seconds when ride is active
+    useEffect(() => {
+        if (!myRide || !["accepted", "on_the_way"].includes(myRide.status)) {
+            if (gpsIntervalRef.current) clearInterval(gpsIntervalRef.current);
+            return;
+        }
+
+        const sendDriverLocation = () => {
+            if (!navigator.geolocation) return;
+            navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                    fetch(`/api/tracking/${myRide._id}`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ lat: pos.coords.latitude, lng: pos.coords.longitude, role: "driver" }),
+                    }).catch(() => { });
+                },
+                () => { },
+                { enableHighAccuracy: true, maximumAge: 5000 }
+            );
+        };
+
+        sendDriverLocation(); // send immediately
+        gpsIntervalRef.current = setInterval(sendDriverLocation, 5000);
+
+        return () => {
+            if (gpsIntervalRef.current) clearInterval(gpsIntervalRef.current);
+        };
+    }, [myRide]);
+
     const handleRefresh = async () => { setRefreshing(true); await fetchAll(); setRefreshing(false); toast.success("Refreshed"); };
 
     const handleAvailabilityToggle = async () => {
@@ -75,9 +108,27 @@ export default function DriverDashboard() {
             setMyRide({ ...booking, status: "accepted" });
             setBookings((prev) => prev.filter((b) => b._id !== booking._id));
             setDriver((prev) => prev ? { ...prev, isAvailable: false } : prev);
-            toast.success("Ride accepted!");
+            setOtpInput("");
+            toast.success("Ride accepted! Ask the passenger for their OTP.");
         } catch { toast.error("Failed to accept ride"); }
         finally { setUpdating(null); }
+    };
+
+    const handleVerifyOtp = async () => {
+        if (!myRide || otpInput.length !== 4) { toast.error("Enter 4-digit OTP"); return; }
+        setOtpVerifying(true);
+        try {
+            const res = await fetch(`/api/bookings/${myRide._id}/verify-otp`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ otp: otpInput }),
+            });
+            const data = await res.json();
+            if (!res.ok) { toast.error(data.message); return; }
+            setMyRide((prev) => prev ? { ...prev, status: "on_the_way", rideOtpVerified: true } : null);
+            toast.success("OTP verified! Ride started 🚀");
+        } catch { toast.error("Failed to verify OTP"); }
+        finally { setOtpVerifying(false); }
     };
 
     const handleStatusUpdate = async (status) => {
@@ -145,11 +196,35 @@ export default function DriverDashboard() {
                                 <MapPin className="w-4 h-4 text-red-400" /><span className="text-red-300">{myRide.dropLocation}</span>
                             </div>
                         </div>
-                        <div className="flex gap-3 flex-wrap">
-                            {myRide.status === "accepted" && (
-                                <button onClick={() => handleStatusUpdate("on_the_way")} disabled={!!updating} className="flex items-center gap-2 px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white font-semibold rounded-xl text-sm disabled:opacity-60">
-                                    {updating ? <Spinner size="sm" /> : <Navigation className="w-4 h-4" />}On the Way</button>
-                            )}
+                        {/* OTP Verification (when ride is accepted but not yet verified) */}
+                        {myRide.status === "accepted" && (
+                            <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 mt-2">
+                                <div className="flex items-center gap-2 mb-3">
+                                    <Key className="w-4 h-4 text-amber-400" />
+                                    <p className="text-sm font-semibold text-amber-300">Enter Passenger's OTP to Start Ride</p>
+                                </div>
+                                <div className="flex gap-2">
+                                    <input
+                                        type="text"
+                                        maxLength={4}
+                                        value={otpInput}
+                                        onChange={(e) => setOtpInput(e.target.value.replace(/\D/g, ""))}
+                                        placeholder="4-digit OTP"
+                                        className="flex-1 px-4 py-2.5 bg-slate-900 border border-slate-600 rounded-xl text-center text-xl font-mono tracking-[0.3em] text-amber-400 placeholder-slate-600 focus:outline-none focus:border-amber-500"
+                                    />
+                                    <button
+                                        onClick={handleVerifyOtp}
+                                        disabled={otpVerifying || otpInput.length !== 4}
+                                        className="px-5 py-2.5 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-slate-900 font-bold rounded-xl text-sm disabled:opacity-40 disabled:cursor-not-allowed"
+                                    >
+                                        {otpVerifying ? <Spinner size="sm" /> : "Verify"}
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Actions for on_the_way status */}
+                        <div className="flex gap-3 flex-wrap mt-2">
                             {myRide.status === "on_the_way" && (
                                 <button onClick={() => handleStatusUpdate("completed")} disabled={!!updating} className="flex items-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-xl text-sm disabled:opacity-60">
                                     {updating ? <Spinner size="sm" /> : <CheckCircle className="w-4 h-4" />}Mark Completed</button>

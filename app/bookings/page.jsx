@@ -80,6 +80,11 @@ export default function BookingsPage() {
                                     {booking.status === "pending" && (
                                         <button onClick={() => handleCancel(booking._id)} className="px-3 py-1 text-xs font-medium text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition-colors">Cancel</button>
                                     )}
+                                    {["accepted", "on_the_way"].includes(booking.status) && (
+                                        <a href={`/track/${booking._id}`} className="inline-flex items-center gap-1 px-3 py-1 text-xs font-medium text-amber-500 border border-amber-300 dark:border-amber-700 rounded-lg hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-colors">
+                                            <MapPin className="w-3 h-3" />Track Live
+                                        </a>
+                                    )}
                                 </div>
                             </div>
                         </div>

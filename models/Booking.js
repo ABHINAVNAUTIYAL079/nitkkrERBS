@@ -19,6 +19,18 @@ const BookingSchema = new Schema(
         fareAmount: { type: Number, default: null },
         rideType: { type: String, enum: ["shared", "private"], default: null },
         nightSurcharge: { type: Number, default: 0 },
+        rideOtp: { type: String, default: null },
+        rideOtpVerified: { type: Boolean, default: false },
+        driverLocation: {
+            lat: { type: Number, default: null },
+            lng: { type: Number, default: null },
+            updatedAt: { type: Date, default: null },
+        },
+        userLocation: {
+            lat: { type: Number, default: null },
+            lng: { type: Number, default: null },
+            updatedAt: { type: Date, default: null },
+        },
     },
     { timestamps: true }
 );

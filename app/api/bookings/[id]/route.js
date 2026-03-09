@@ -2,7 +2,9 @@ import { NextResponse } from "next/server";
 import dbConnect from "@/lib/db";
 import Booking from "@/models/Booking";
 import Driver from "@/models/Driver";
+import User from "@/models/User";
 import { getUserFromRequest } from "@/lib/getUser";
+import { sendOtpEmail } from "@/lib/email";
 
 export const dynamic = "force-dynamic";
 
@@ -16,7 +18,7 @@ export async function PATCH(req, { params }) {
         if (!booking) return NextResponse.json({ message: "Booking not found" }, { status: 404 });
         const validTransitions = {
             pending: ["accepted", "cancelled"],
-            accepted: ["on_the_way", "cancelled"],
+            accepted: ["cancelled"],
             on_the_way: ["completed"],
             completed: [],
             cancelled: [],
@@ -30,8 +32,26 @@ export async function PATCH(req, { params }) {
                 booking.driverId = driver._id;
                 booking.driverName = driver.name;
                 await Driver.findByIdAndUpdate(user.id, { isAvailable: false });
+
+                // Generate 4-digit ride OTP
+                const rideOtp = String(Math.floor(1000 + Math.random() * 9000));
+                booking.rideOtp = rideOtp;
+                booking.rideOtpVerified = false;
+
+                // Try to email OTP to the user
+                const studentUser = await User.findOne({ phone: booking.phone });
+                if (studentUser?.email) {
+                    sendOtpEmail(studentUser.email, rideOtp).catch((err) =>
+                        console.error("Failed to send ride OTP email:", err)
+                    );
+                }
             }
-            if (status === "completed") await Driver.findByIdAndUpdate(user.id, { isAvailable: true });
+            if (status === "completed") {
+                await Driver.findByIdAndUpdate(user.id, { isAvailable: true });
+                // Clear tracking data
+                booking.driverLocation = { lat: null, lng: null, updatedAt: null };
+                booking.userLocation = { lat: null, lng: null, updatedAt: null };
+            }
         }
         booking.status = status;
         if (notes) booking.notes = notes;

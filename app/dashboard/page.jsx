@@ -89,7 +89,7 @@ export default function DashboardPage() {
             const data = await res.json();
             if (!res.ok) { toast.error(data.message || "Booking failed"); return; }
             toast.success("🛺 Ride booked! Check confirmation below.");
-            const confirmUrl = `/booking-confirm?bookingId=${data.booking.bookingId}&name=${encodeURIComponent(user?.name || "")}&distance=${distanceKm ? distanceKm.toFixed(2) : ""}&fare=${fareAmount ?? ""}&rideType=${rideType}`;
+            const confirmUrl = `/booking-confirm?bookingId=${data.booking.bookingId}&id=${data.booking.id}&name=${encodeURIComponent(user?.name || "")}&distance=${distanceKm ? distanceKm.toFixed(2) : ""}&fare=${fareAmount ?? ""}&rideType=${rideType}`;
             window.location.href = confirmUrl;
         } catch { toast.error("Network error."); }
         finally { setLoading(false); }
