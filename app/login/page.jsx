@@ -231,7 +231,12 @@ function LoginContent() {
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1.5">Password</label>
+                                    <div className="flex items-center justify-between mb-1.5">
+                                        <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">Password</label>
+                                        <Link href="/forgot-password?type=driver" className="text-xs text-blue-500 hover:text-blue-400">
+                                            Forgot Password?
+                                        </Link>
+                                    </div>
                                     <div className="relative">
                                         <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                         <input
@@ -316,11 +321,7 @@ function LoginContent() {
                                 >
                                     {loading ? <Spinner size="sm" /> : <><ShieldCheck className="w-4 h-4" /> Sign In as Admin</>}
                                 </button>
-                                <div className="p-3 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-xl">
-                                    <p className="text-xs text-orange-700 dark:text-orange-300 font-semibold mb-0.5">🔑 Default Credentials</p>
-                                    <p className="text-xs text-slate-600 dark:text-slate-400">Email: <span className="font-mono font-bold">admin@nitkkr.ac.in</span></p>
-                                    <p className="text-xs text-slate-600 dark:text-slate-400">Password: <span className="font-mono font-bold">admin123</span></p>
-                                </div>
+
                             </form>
                         </>
                     )}

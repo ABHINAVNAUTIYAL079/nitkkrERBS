@@ -2,13 +2,15 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import { Phone, Lock, User, Car, Eye, EyeOff, CheckCircle2 } from "lucide-react";
+import { Phone, Lock, User, Car, Eye, EyeOff, CheckCircle2, Mail } from "lucide-react";
 import Link from "next/link";
 import { Spinner } from "@/components/ui";
 
+const RICKSHAW_REGEX = /^[A-Z]{2}\d{2}[A-Z]{1,2}\d{4}$/;
+
 export default function DriverRegisterPage() {
     const router = useRouter();
-    const [form, setForm] = useState({ name: "", phone: "", password: "", confirmPassword: "", rickshawNumber: "" });
+    const [form, setForm] = useState({ name: "", phone: "", email: "", password: "", confirmPassword: "", rickshawNumber: "" });
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);
@@ -16,7 +18,10 @@ export default function DriverRegisterPage() {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setForm((prev) => ({ ...prev, [name]: name === "phone" ? value.replace(/\D/g, "") : value }));
+        setForm((prev) => ({
+            ...prev,
+            [name]: name === "phone" ? value.replace(/\D/g, "") : name === "rickshawNumber" ? value.toUpperCase() : value,
+        }));
     };
 
     const handleSubmit = async (e) => {
@@ -24,12 +29,16 @@ export default function DriverRegisterPage() {
         if (form.password !== form.confirmPassword) { toast.error("Passwords do not match."); return; }
         if (form.password.length < 6) { toast.error("Password must be at least 6 characters."); return; }
         if (!/^\d{10}$/.test(form.phone)) { toast.error("Phone number must be exactly 10 digits."); return; }
+        if (!RICKSHAW_REGEX.test(form.rickshawNumber)) {
+            toast.error("Invalid rickshaw number format. Use format like HR01AB1234");
+            return;
+        }
         setLoading(true);
         try {
             const res = await fetch("/api/auth/driver/register", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ name: form.name, phone: form.phone, password: form.password, rickshawNumber: form.rickshawNumber }),
+                body: JSON.stringify({ name: form.name, phone: form.phone, email: form.email, password: form.password, rickshawNumber: form.rickshawNumber }),
             });
             const data = await res.json();
             if (!res.ok) { toast.error(data.message || "Registration failed."); return; }
@@ -81,12 +90,18 @@ export default function DriverRegisterPage() {
                         <div><label className="block text-xs font-medium text-slate-300 mb-1.5">Full Name</label>
                             <div className="relative"><User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                 <input type="text" name="name" required value={form.name} onChange={handleChange} placeholder="Enter your full name" className="w-full pl-10 pr-4 py-2.5 bg-white/10 border border-white/20 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm" /></div></div>
+                        <div><label className="block text-xs font-medium text-slate-300 mb-1.5">Email Address</label>
+                            <div className="relative"><Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                <input type="email" name="email" required value={form.email} onChange={handleChange} placeholder="your@email.com" className="w-full pl-10 pr-4 py-2.5 bg-white/10 border border-white/20 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm" /></div></div>
                         <div><label className="block text-xs font-medium text-slate-300 mb-1.5">Phone Number</label>
                             <div className="relative"><Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                 <input type="tel" name="phone" required maxLength={10} value={form.phone} onChange={handleChange} placeholder="10-digit phone number" className="w-full pl-10 pr-4 py-2.5 bg-white/10 border border-white/20 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm" /></div></div>
                         <div><label className="block text-xs font-medium text-slate-300 mb-1.5">Rickshaw Number</label>
                             <div className="relative"><Car className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                                <input type="text" name="rickshawNumber" required value={form.rickshawNumber} onChange={handleChange} placeholder="e.g. HR01AB1234" className="w-full pl-10 pr-4 py-2.5 bg-white/10 border border-white/20 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm uppercase" /></div></div>
+                                <input type="text" name="rickshawNumber" required value={form.rickshawNumber} onChange={handleChange} placeholder="e.g. HR01AB1234" className="w-full pl-10 pr-4 py-2.5 bg-white/10 border border-white/20 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm uppercase" /></div>
+                            {form.rickshawNumber && !RICKSHAW_REGEX.test(form.rickshawNumber) && (
+                                <p className="text-amber-400 text-xs mt-1">Format: XX00XX0000 (e.g. HR01AB1234)</p>
+                            )}</div>
                         <div><label className="block text-xs font-medium text-slate-300 mb-1.5">Password</label>
                             <div className="relative"><Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                 <input type={showPassword ? "text" : "password"} name="password" required value={form.password} onChange={handleChange} placeholder="Min. 6 characters" className="w-full pl-10 pr-10 py-2.5 bg-white/10 border border-white/20 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm" />

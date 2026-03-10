@@ -4,15 +4,9 @@ const DriverSchema = new Schema(
     {
         name: { type: String, required: true, trim: true },
         phone: { type: String, required: true, unique: true, trim: true },
+        email: { type: String, required: true, unique: true, trim: true, lowercase: true },
         password: { type: String, required: true },
         rickshawNumber: { type: String, required: true, unique: true, trim: true },
-        nitRegistrationId: { 
-            type: String, 
-            unique: true, 
-            sparse: true, 
-            trim: true,
-            default: undefined // Ensure it's not even a null record
-        },
         status: {
             type: String,
             enum: ["pending", "approved", "suspended"],

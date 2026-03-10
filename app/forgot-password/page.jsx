@@ -1,11 +1,15 @@
 "use client";
-import { useState } from "react";
+import { useState, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import { Mail, Lock, Eye, EyeOff, ArrowRight, ShieldCheck } from "lucide-react";
 import { Spinner } from "@/components/ui";
 
-export default function ForgotPasswordPage() {
+function ForgotPasswordContent() {
+    const searchParams = useSearchParams();
+    const type = searchParams.get("type") === "driver" ? "driver" : "user";
+
     const [step, setStep] = useState("email");
     const [loading, setLoading] = useState(false);
     const [email, setEmail] = useState("");
@@ -16,11 +20,13 @@ export default function ForgotPasswordPage() {
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
 
+    const apiBase = type === "driver" ? "/api/auth/driver" : "/api/auth/user";
+
     const handleRequestOtp = async (e) => {
         e.preventDefault();
         setLoading(true);
         try {
-            const res = await fetch("/api/auth/user/forgot-password", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email }) });
+            const res = await fetch(`${apiBase}/forgot-password`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email }) });
             const data = await res.json();
             if (!res.ok) { toast.error(data.message || "Failed to send OTP"); return; }
             setStep("otp");
@@ -35,7 +41,7 @@ export default function ForgotPasswordPage() {
         if (otp.length !== 6) { toast.error("Enter the 6-digit OTP"); return; }
         setLoading(true);
         try {
-            const res = await fetch("/api/auth/user/verify-otp", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, code: otp, purpose: "reset" }) });
+            const res = await fetch(`${apiBase}/verify-otp`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, code: otp, purpose: type === "driver" ? "driver-reset" : "reset" }) });
             const data = await res.json();
             if (!res.ok) { toast.error(data.message || "OTP verification failed"); return; }
             setStep("reset");
@@ -47,10 +53,11 @@ export default function ForgotPasswordPage() {
     const handleReset = async (e) => {
         e.preventDefault();
         if (newPassword !== confirmPassword) { toast.error("Passwords do not match"); return; }
-        if (newPassword.length < 8) { toast.error("Password must be at least 8 characters"); return; }
+        const minLen = type === "driver" ? 6 : 8;
+        if (newPassword.length < minLen) { toast.error(`Password must be at least ${minLen} characters`); return; }
         setLoading(true);
         try {
-            const res = await fetch("/api/auth/user/reset-password", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, newPassword }) });
+            const res = await fetch(`${apiBase}/reset-password`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, newPassword }) });
             const data = await res.json();
             if (!res.ok) { toast.error(data.message || "Reset failed"); return; }
             toast.success("Password reset successfully! Please sign in.");
@@ -61,6 +68,7 @@ export default function ForgotPasswordPage() {
 
     const stepLabels = ["Enter Email", "Verify OTP", "New Password"];
     const currentStepIdx = step === "email" ? 0 : step === "otp" ? 1 : 2;
+    const title = type === "driver" ? "Driver Forgot Password" : "Forgot Password";
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 flex items-center justify-center px-4">
@@ -71,7 +79,7 @@ export default function ForgotPasswordPage() {
             <div className="relative w-full max-w-md">
                 <div className="text-center mb-8">
                     <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl mb-4 shadow-lg shadow-emerald-500/30"><img src="/logo.png" alt="Logo" className="w-14 h-14 rounded-2xl object-cover" /></div>
-                    <h1 className="text-2xl font-bold text-white">Forgot Password</h1>
+                    <h1 className="text-2xl font-bold text-white">{title}</h1>
                     <p className="text-slate-400 text-sm mt-1">Reset via OTP sent to your email</p>
                 </div>
                 <div className="flex items-center justify-center gap-2 mb-6">
@@ -111,7 +119,7 @@ export default function ForgotPasswordPage() {
                         <form onSubmit={handleReset} className="space-y-4">
                             <div><label className="block text-xs font-medium text-slate-300 mb-1.5">New Password</label>
                                 <div className="relative"><Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                                    <input type={showPass ? "text" : "password"} required value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="Min. 8 characters" className="w-full pl-10 pr-10 py-2.5 bg-slate-800/60 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm" />
+                                    <input type={showPass ? "text" : "password"} required value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder={`Min. ${type === "driver" ? 6 : 8} characters`} className="w-full pl-10 pr-10 py-2.5 bg-slate-800/60 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm" />
                                     <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white">{showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}</button></div></div>
                             <div><label className="block text-xs font-medium text-slate-300 mb-1.5">Confirm New Password</label>
                                 <div className="relative"><Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -127,5 +135,13 @@ export default function ForgotPasswordPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function ForgotPasswordPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen" />}>
+            <ForgotPasswordContent />
+        </Suspense>
     );
 }

@@ -3,7 +3,7 @@ import mongoose, { Schema } from "mongoose";
 const OtpSchema = new Schema({
     email: { type: String, required: true },
     code: { type: String, required: true },
-    purpose: { type: String, enum: ["register", "reset"], required: true },
+    purpose: { type: String, enum: ["register", "reset", "driver-reset"], required: true },
     expiresAt: { type: Date, required: true },
     pendingUser: {
         name: String,

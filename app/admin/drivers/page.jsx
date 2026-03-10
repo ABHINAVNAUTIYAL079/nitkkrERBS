@@ -6,7 +6,8 @@ import { LogOut, ShieldCheck, PlusCircle, X, KeyRound, Users, LayoutDashboard } 
 import Link from "next/link";
 import { StatusBadge, Spinner } from "@/components/ui";
 
-const emptyForm = { name: "", phone: "", password: "", rickshawNumber: "", nitRegistrationId: "" };
+const RICKSHAW_REGEX = /^[A-Z]{2}\d{2}[A-Z]{1,2}\d{4}$/;
+const emptyForm = { name: "", phone: "", password: "", rickshawNumber: "" };
 
 export default function AdminDriversPage() {
     const router = useRouter();
@@ -30,9 +31,13 @@ export default function AdminDriversPage() {
 
     const handleAddDriver = async (e) => {
         e.preventDefault();
+        if (!RICKSHAW_REGEX.test(addForm.rickshawNumber.toUpperCase())) {
+            toast.error("Invalid rickshaw number format. Use format like HR01AB1234");
+            return;
+        }
         setAddLoading(true);
         try {
-            const res = await fetch("/api/admin/drivers", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(addForm) });
+            const res = await fetch("/api/admin/drivers", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...addForm, rickshawNumber: addForm.rickshawNumber.toUpperCase() }) });
             const data = await res.json();
             if (!res.ok) { toast.error(data.message); return; }
             toast.success("Driver added successfully!");
@@ -95,12 +100,14 @@ export default function AdminDriversPage() {
                                 { key: "name", label: "Full Name", placeholder: "Driver full name", type: "text" },
                                 { key: "phone", label: "Phone Number", placeholder: "10-digit number", type: "tel" },
                                 { key: "password", label: "Initial Password", placeholder: "Min 6 characters", type: "password" },
-                                { key: "rickshawNumber", label: "Rickshaw Number", placeholder: "e.g. ER-001", type: "text" },
-                                { key: "nitRegistrationId", label: "NIT Registration ID", placeholder: "e.g. NIT-2024-001", type: "text" },
+                                { key: "rickshawNumber", label: "Rickshaw Number", placeholder: "e.g. HR01AB1234", type: "text" },
                             ].map(({ key, label, placeholder, type }) => (
                                 <div key={key}>
                                     <label className="block text-xs font-semibold text-slate-600 mb-1.5">{label}</label>
-                                    <input type={type} required value={addForm[key]} onChange={(e) => setAddForm({ ...addForm, [key]: e.target.value })} placeholder={placeholder} className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-300" />
+                                    <input type={type} required value={addForm[key]} onChange={(e) => setAddForm({ ...addForm, [key]: key === "rickshawNumber" ? e.target.value.toUpperCase() : e.target.value })} placeholder={placeholder} className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-300" />
+                                    {key === "rickshawNumber" && addForm.rickshawNumber && !RICKSHAW_REGEX.test(addForm.rickshawNumber.toUpperCase()) && (
+                                        <p className="text-amber-600 text-xs mt-1">Format: XX00XX0000 (e.g. HR01AB1234)</p>
+                                    )}
                                 </div>
                             ))}
                             <div className="md:col-span-2 flex gap-3">
@@ -124,7 +131,7 @@ export default function AdminDriversPage() {
                         <div className="overflow-x-auto">
                             <table className="w-full text-sm">
                                 <thead><tr className="bg-slate-50">
-                                    {["Name", "Phone", "Rickshaw No.", "NIT ID", "Status", "Availability", "Actions"].map((h) => (
+                                    {["Name", "Phone", "Rickshaw No.", "Status", "Availability", "Actions"].map((h) => (
                                         <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">{h}</th>
                                     ))}</tr></thead>
                                 <tbody className="divide-y divide-slate-50">
@@ -133,7 +140,6 @@ export default function AdminDriversPage() {
                                             <td className="px-4 py-3 font-medium text-slate-800">{driver.name}</td>
                                             <td className="px-4 py-3 text-slate-500">{driver.phone}</td>
                                             <td className="px-4 py-3 text-slate-500">{driver.rickshawNumber}</td>
-                                            <td className="px-4 py-3 text-slate-500">{driver.nitRegistrationId}</td>
                                             <td className="px-4 py-3"><StatusBadge status={driver.status} /></td>
                                             <td className="px-4 py-3">
                                                 <span className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full ${driver.isAvailable ? "bg-green-100 text-green-700" : "bg-slate-100 text-slate-500"}`}>

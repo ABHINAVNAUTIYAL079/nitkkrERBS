@@ -3,33 +3,50 @@ import bcrypt from "bcryptjs";
 import connectDB from "@/lib/db";
 import Driver from "@/models/Driver";
 
+const RICKSHAW_REGEX = /^[A-Z]{2}\d{2}[A-Z]{1,2}\d{4}$/;
+
 export async function POST(req) {
     try {
         await connectDB();
         const body = await req.json();
-        
+
         // Normalize and extract fields
         const name = body.name?.trim();
         const phone = body.phone?.trim();
+        const email = body.email?.trim().toLowerCase();
         const password = body.password;
         const rickshawNumber = body.rickshawNumber?.trim().toUpperCase();
 
-        if (!name || !phone || !password || !rickshawNumber) {
+        if (!name || !phone || !email || !password || !rickshawNumber) {
             return NextResponse.json({ message: "All fields are required." }, { status: 400 });
         }
-        
+
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            return NextResponse.json({ message: "Please enter a valid email address." }, { status: 400 });
+        }
+
         if (!/^\d{10}$/.test(phone)) {
             return NextResponse.json({ message: "Phone number must be exactly 10 digits." }, { status: 400 });
         }
-        
+
         if (password.length < 6) {
             return NextResponse.json({ message: "Password must be at least 6 characters." }, { status: 400 });
+        }
+
+        if (!RICKSHAW_REGEX.test(rickshawNumber)) {
+            return NextResponse.json({ message: "Invalid rickshaw number format. Use format like HR01AB1234." }, { status: 400 });
         }
 
         // Check for existing phone number
         const existingPhone = await Driver.findOne({ phone });
         if (existingPhone) {
             return NextResponse.json({ message: "This phone number is already registered." }, { status: 409 });
+        }
+
+        // Check for existing email
+        const existingEmail = await Driver.findOne({ email });
+        if (existingEmail) {
+            return NextResponse.json({ message: "This email is already registered." }, { status: 409 });
         }
 
         // Check for existing rickshaw number (with normalized input)
@@ -39,29 +56,31 @@ export async function POST(req) {
         }
 
         const hashedPassword = await bcrypt.hash(password, 12);
-        
+
         await Driver.create({
             name,
             phone,
+            email,
             password: hashedPassword,
             rickshawNumber,
             status: "pending",
             isAvailable: false
         });
 
-        return NextResponse.json({ 
-            message: "Registration successful! Your account is pending admin approval. You will be able to login once approved." 
+        return NextResponse.json({
+            message: "Registration successful! Your account is pending admin approval. You will be able to login once approved."
         }, { status: 201 });
 
     } catch (error) {
         console.error("Driver registration error:", error);
-        
+
         // Handle MongoDB duplicate key errors specifically
         if (error.code === 11000) {
             const field = Object.keys(error.keyPattern || {})[0] || "field";
-            const message = field === "phone" ? "This phone number is already registered." : 
-                           field === "rickshawNumber" ? "This rickshaw number is already registered." :
-                           `A driver with this ${field} already exists.`;
+            const message = field === "phone" ? "This phone number is already registered." :
+                field === "rickshawNumber" ? "This rickshaw number is already registered." :
+                    field === "email" ? "This email is already registered." :
+                        `A driver with this ${field} already exists.`;
             return NextResponse.json({ message }, { status: 409 });
         }
 
