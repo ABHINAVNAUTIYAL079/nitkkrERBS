@@ -16,7 +16,7 @@ export default function AdminDashboard() {
         const params = new URLSearchParams();
         if (statusFilter) params.set("status", statusFilter);
         if (searchPhone) params.set("phone", searchPhone);
-        const res = await fetch(`/api/bookings?${params}`);
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/bookings?${params}`);
         if (res.status === 401) { navigate("/login"); return; }
         const data = await res.json();
         setBookings(data.bookings || []);
@@ -25,7 +25,7 @@ export default function AdminDashboard() {
     useEffect(() => { fetchBookings().finally(() => setLoading(false)); }, [fetchBookings]);
 
     const handleRefresh = async () => { setRefreshing(true); await fetchBookings(); setRefreshing(false); };
-    const handleLogout = async () => { await fetch("/api/auth/logout", { method: "POST" }); navigate("/login"); };
+    const handleLogout = async () => { await fetch(`${import.meta.env.VITE_API_URL}/auth/logout`, { method: "POST" }); navigate("/login"); };
 
     const stats = {
         total: bookings.length,

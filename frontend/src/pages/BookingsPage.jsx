@@ -17,7 +17,7 @@ export default function BookingsPage() {
         if (!/^\d{10}$/.test(phone)) { toast.error("Please enter a valid 10-digit phone number"); return; }
         setLoading(true);
         try {
-            const res = await fetch(`/api/bookings?phone=${phone}`);
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/bookings?phone=${phone}`);
             const data = await res.json();
             setBookings(data.bookings || []);
             setSearched(true);
@@ -30,7 +30,7 @@ export default function BookingsPage() {
         const confirmed = window.confirm("Cancel this booking?");
         if (!confirmed) return;
         try {
-            const res = await fetch(`/api/bookings/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: "cancelled" }) });
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/bookings/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: "cancelled" }) });
             if (!res.ok) { const d = await res.json(); toast.error(d.message || "Cannot cancel this booking"); return; }
             toast.success("Booking cancelled");
             setBookings((prev) => prev.map((b) => (b._id === id ? { ...b, status: "cancelled" } : b)));

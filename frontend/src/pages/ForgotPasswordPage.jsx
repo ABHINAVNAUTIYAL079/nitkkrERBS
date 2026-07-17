@@ -19,7 +19,7 @@ function ForgotPasswordContent() {
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
 
-    const apiBase = type === "driver" ? "/api/auth/driver" : "/api/auth/user";
+    const apiBase = type === "driver" ? `${import.meta.env.VITE_API_URL}/auth/driver` : `${import.meta.env.VITE_API_URL}/auth/user`;
 
     const handleRequestOtp = async (e) => {
         e.preventDefault();

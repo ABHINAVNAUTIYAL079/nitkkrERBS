@@ -33,7 +33,7 @@ export default function DriverRegisterPage() {
         }
         setLoading(true);
         try {
-            const res = await fetch("/api/auth/driver/register", {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/driver/register`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ name: form.name, phone: form.phone, email: form.email, password: form.password, rickshawNumber: form.rickshawNumber }),

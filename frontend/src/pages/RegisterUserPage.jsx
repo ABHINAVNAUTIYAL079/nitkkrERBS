@@ -28,7 +28,7 @@ export default function RegisterUserPage() {
         if (form.password.length < 8) { toast.error("Password must be at least 8 characters"); return; }
         setLoading(true);
         try {
-            const res = await fetch("/api/auth/user/register", {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/user/register`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ name: form.name, phone: form.phone, email: form.email, password: form.password }),
@@ -48,7 +48,7 @@ export default function RegisterUserPage() {
         if (otp.length !== 6) { toast.error("Enter the 6-digit OTP"); return; }
         setLoading(true);
         try {
-            const res = await fetch("/api/auth/user/verify-otp", {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/user/verify-otp`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email: form.email, code: otp, purpose: "register" }),

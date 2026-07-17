@@ -19,7 +19,7 @@ export default function AdminDriversPage() {
     const [actionLoading, setActionLoading] = useState(null);
 
     const fetchDrivers = useCallback(async () => {
-        const res = await fetch("/api/admin/drivers");
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/admin/drivers`);
         if (res.status === 401) { navigate("/login"); return; }
         const data = await res.json();
         setDrivers(data.drivers || []);
@@ -35,7 +35,7 @@ export default function AdminDriversPage() {
         }
         setAddLoading(true);
         try {
-            const res = await fetch("/api/admin/drivers", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...addForm, rickshawNumber: addForm.rickshawNumber.toUpperCase() }) });
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/admin/drivers`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...addForm, rickshawNumber: addForm.rickshawNumber.toUpperCase() }) });
             const data = await res.json();
             if (!res.ok) { toast.error(data.message); return; }
             toast.success("Driver added successfully!");
@@ -47,7 +47,7 @@ export default function AdminDriversPage() {
     const handleStatusChange = async (id, status) => {
         setActionLoading(id + status);
         try {
-            const res = await fetch(`/api/admin/drivers/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status }) });
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/admin/drivers/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status }) });
             const data = await res.json();
             if (!res.ok) { toast.error(data.message); return; }
             toast.success(data.message);
@@ -60,7 +60,7 @@ export default function AdminDriversPage() {
         if (!resetModal || newPassword.length < 6) { toast.error("Password must be at least 6 characters"); return; }
         setActionLoading(resetModal.id + "reset");
         try {
-            const res = await fetch(`/api/admin/drivers/${resetModal.id}/reset-password`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ newPassword }) });
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/admin/drivers/${resetModal.id}/reset-password`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ newPassword }) });
             const data = await res.json();
             if (!res.ok) { toast.error(data.message); return; }
             toast.success("Password reset successfully");
@@ -69,7 +69,7 @@ export default function AdminDriversPage() {
         finally { setActionLoading(null); }
     };
 
-    const handleLogout = async () => { await fetch("/api/auth/logout", { method: "POST" }); navigate("/login"); };
+    const handleLogout = async () => { await fetch(`${import.meta.env.VITE_API_URL}/auth/logout`, { method: "POST" }); navigate("/login"); };
 
     return (
         <div className="min-h-screen bg-slate-100">

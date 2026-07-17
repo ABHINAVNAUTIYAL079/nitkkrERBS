@@ -21,7 +21,7 @@ export default function HomePage() {
 
     useEffect(() => {
         // If user is already logged in as a student, redirect to dashboard
-        fetch("/api/auth/me").then(async (res) => {
+        fetch(`${import.meta.env.VITE_API_URL}/auth/me`).then(async (res) => {
             if (res.ok) {
                 const data = await res.json();
                 if (data.user?.role === "user") {

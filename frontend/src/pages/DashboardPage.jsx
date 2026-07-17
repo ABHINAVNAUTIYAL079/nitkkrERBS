@@ -33,11 +33,11 @@ export default function DashboardPage() {
 
     useEffect(() => {
         async function init() {
-            const meRes = await fetch("/api/auth/me");
+            const meRes = await fetch(`${import.meta.env.VITE_API_URL}/auth/me`);
             if (!meRes.ok) { navigate("/"); return; }
             const meData = await meRes.json();
             setUser(meData.user);
-            const bRes = await fetch(`/api/bookings?phone=${meData.user.phone}`);
+            const bRes = await fetch(`${import.meta.env.VITE_API_URL}/bookings?phone=${meData.user.phone}`);
             if (bRes.ok) {
                 const bData = await bRes.json();
                 const bookings = bData.bookings || [];
@@ -49,7 +49,7 @@ export default function DashboardPage() {
         init();
     }, [navigate]);
 
-    const handleLogout = async () => { await fetch("/api/auth/logout", { method: "POST" }); navigate("/"); };
+    const handleLogout = async () => { await fetch(`${import.meta.env.VITE_API_URL}/auth/logout`, { method: "POST" }); navigate("/"); };
 
     const handleRouteReady = useCallback(({ distanceKm: km, durationMin: mins }) => {
         setDistanceKm(km); setDurationMin(mins);
@@ -67,7 +67,7 @@ export default function DashboardPage() {
         if (pickup.label === drop.label) { toast.error("Pickup and drop cannot be the same"); return; }
         setLoading(true);
         try {
-            const res = await fetch("/api/bookings", {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/bookings`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({

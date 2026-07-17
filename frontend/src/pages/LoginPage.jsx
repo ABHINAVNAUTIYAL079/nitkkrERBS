@@ -42,7 +42,7 @@ function LoginContent() {
         }
         setLoading(true);
         try {
-            const res = await fetch("/api/auth/user/login", {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/user/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(userForm),
@@ -59,7 +59,7 @@ function LoginContent() {
         e.preventDefault();
         setLoading(true);
         try {
-            const res = await fetch("/api/auth/driver/login", {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/driver/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(driverForm),
@@ -76,7 +76,7 @@ function LoginContent() {
         e.preventDefault();
         setLoading(true);
         try {
-            const res = await fetch("/api/auth/admin/login", {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/admin/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(adminForm),
