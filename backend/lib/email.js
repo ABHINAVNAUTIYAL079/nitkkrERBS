@@ -32,6 +32,8 @@ export async function sendOtpEmail(toEmail, otp) {
                 // Remove spaces from App Password (Google displays them with spaces but they shouldn't be included)
                 pass: gmailPass.replace(/\s+/g, ""),
             },
+            connectionTimeout: 10000, // 10 seconds timeout
+            socketTimeout: 10000,     // 10 seconds timeout
         });
 
         await transporter.sendMail({
