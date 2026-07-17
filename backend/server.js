@@ -13,7 +13,7 @@ import adminDriversRoutes from './routes/adminDrivers.js';
 import driverRoutes from './routes/driver.js';
 import trackingRoutes from './routes/tracking.js';
 
-dotenv.config({ path: '../.env' }); // Load env variables from root .env
+dotenv.config(); // Load env variables from root .env
 
 const app = express();
 
