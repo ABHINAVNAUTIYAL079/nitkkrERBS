@@ -7,7 +7,7 @@ node_modules/
 /coverage
 
 # Production builds
-/client/dist
+/frontend/dist
 /build
 
 # Misc
