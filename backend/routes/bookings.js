@@ -105,6 +105,12 @@ router.patch('/:id', async (req, res) => {
         const allowed = validTransitions[booking.status] || [];
         if (!allowed.includes(status)) return res.status(400).json({ message: `Cannot transition from '${booking.status}' to '${status}'` });
         
+        // Users (non-driver, non-admin) can only cancel their own bookings
+        if (user.role === "user") {
+            if (status !== "cancelled") return res.status(403).json({ message: "Users can only cancel bookings" });
+            if (booking.phone !== user.phone) return res.status(403).json({ message: "You can only cancel your own bookings" });
+        }
+        
         if (user.role === "driver") {
             if (status === "accepted") {
                 const driver = await Driver.findById(user.id);
@@ -128,6 +134,10 @@ router.patch('/:id', async (req, res) => {
                 booking.driverLocation = { lat: null, lng: null, updatedAt: null };
                 booking.userLocation = { lat: null, lng: null, updatedAt: null };
             }
+            // When driver cancels an accepted booking, free them up
+            if (status === "cancelled" && booking.driverId?.toString() === user.id) {
+                await Driver.findByIdAndUpdate(user.id, { isAvailable: true });
+            }
         }
         
         booking.status = status;
@@ -140,6 +150,7 @@ router.patch('/:id', async (req, res) => {
         return res.status(500).json({ message: "Internal server error" });
     }
 });
+
 
 // POST /api/bookings/:id/verify-otp
 router.post('/:id/verify-otp', async (req, res) => {

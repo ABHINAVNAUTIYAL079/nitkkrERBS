@@ -30,6 +30,7 @@ export default function RegisterUserPage() {
         try {
             const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/user/register`, {
                 method: "POST",
+                credentials: 'include',
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ name: form.name, phone: form.phone, email: form.email, password: form.password }),
             });
@@ -50,6 +51,7 @@ export default function RegisterUserPage() {
         try {
             const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/user/verify-otp`, {
                 method: "POST",
+                credentials: 'include',
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email: form.email, code: otp, purpose: "register" }),
             });

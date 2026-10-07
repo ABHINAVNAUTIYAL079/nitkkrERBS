@@ -25,7 +25,7 @@ function ForgotPasswordContent() {
         e.preventDefault();
         setLoading(true);
         try {
-            const res = await fetch(`${apiBase}/forgot-password`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email }) });
+            const res = await fetch(`${apiBase}/forgot-password`, { method: "POST", credentials: 'include', headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email }) });
             const data = await res.json();
             if (!res.ok) { toast.error(data.message || "Failed to send OTP"); return; }
             setStep("otp");
@@ -40,7 +40,7 @@ function ForgotPasswordContent() {
         if (otp.length !== 6) { toast.error("Enter the 6-digit OTP"); return; }
         setLoading(true);
         try {
-            const res = await fetch(`${apiBase}/verify-otp`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, code: otp, purpose: type === "driver" ? "driver-reset" : "reset" }) });
+            const res = await fetch(`${apiBase}/verify-otp`, { method: "POST", credentials: 'include', headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, code: otp, purpose: type === "driver" ? "driver-reset" : "reset" }) });
             const data = await res.json();
             if (!res.ok) { toast.error(data.message || "OTP verification failed"); return; }
             setStep("reset");
@@ -56,7 +56,7 @@ function ForgotPasswordContent() {
         if (newPassword.length < minLen) { toast.error(`Password must be at least ${minLen} characters`); return; }
         setLoading(true);
         try {
-            const res = await fetch(`${apiBase}/reset-password`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, newPassword }) });
+            const res = await fetch(`${apiBase}/reset-password`, { method: "POST", credentials: 'include', headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, newPassword }) });
             const data = await res.json();
             if (!res.ok) { toast.error(data.message || "Reset failed"); return; }
             toast.success("Password reset successfully! Please sign in.");

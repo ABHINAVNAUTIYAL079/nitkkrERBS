@@ -2,6 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import connectDB from './lib/db.js';
 
 import authUserRoutes from './routes/authUser.js';
@@ -13,7 +15,9 @@ import adminDriversRoutes from './routes/adminDrivers.js';
 import driverRoutes from './routes/driver.js';
 import trackingRoutes from './routes/tracking.js';
 
-dotenv.config(); // Load env variables from root .env
+// Load env variables from root .env (one level above backend/)
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 const app = express();
 
@@ -26,7 +30,9 @@ app.use(express.json());
 app.use(cookieParser());
 
 // Connect to Database
-connectDB();
+connectDB()
+    .then(() => console.log('MongoDB connected successfully'))
+    .catch((err) => console.error('MongoDB connection error:', err.message));
 
 // Routes
 app.use('/api/auth/user', authUserRoutes);

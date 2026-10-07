@@ -44,6 +44,7 @@ function LoginContent() {
         try {
             const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/user/login`, {
                 method: "POST",
+                credentials: 'include',
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(userForm),
             });
@@ -61,6 +62,7 @@ function LoginContent() {
         try {
             const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/driver/login`, {
                 method: "POST",
+                credentials: 'include',
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(driverForm),
             });
@@ -78,6 +80,7 @@ function LoginContent() {
         try {
             const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/admin/login`, {
                 method: "POST",
+                credentials: 'include',
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(adminForm),
             });

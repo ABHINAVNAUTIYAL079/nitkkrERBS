@@ -33,11 +33,11 @@ export default function DashboardPage() {
 
     useEffect(() => {
         async function init() {
-            const meRes = await fetch(`${import.meta.env.VITE_API_URL}/auth/me`);
+            const meRes = await fetch(`${import.meta.env.VITE_API_URL}/auth/me`, { credentials: 'include' });
             if (!meRes.ok) { navigate("/"); return; }
             const meData = await meRes.json();
             setUser(meData.user);
-            const bRes = await fetch(`${import.meta.env.VITE_API_URL}/bookings?phone=${meData.user.phone}`);
+            const bRes = await fetch(`${import.meta.env.VITE_API_URL}/bookings?phone=${meData.user.phone}`, { credentials: 'include' });
             if (bRes.ok) {
                 const bData = await bRes.json();
                 const bookings = bData.bookings || [];
@@ -49,7 +49,7 @@ export default function DashboardPage() {
         init();
     }, [navigate]);
 
-    const handleLogout = async () => { await fetch(`${import.meta.env.VITE_API_URL}/auth/logout`, { method: "POST" }); navigate("/"); };
+    const handleLogout = async () => { await fetch(`${import.meta.env.VITE_API_URL}/auth/logout`, { method: "POST", credentials: 'include' }); navigate("/"); };
 
     const handleRouteReady = useCallback(({ distanceKm: km, durationMin: mins }) => {
         setDistanceKm(km); setDurationMin(mins);
@@ -69,6 +69,7 @@ export default function DashboardPage() {
         try {
             const res = await fetch(`${import.meta.env.VITE_API_URL}/bookings`, {
                 method: "POST",
+                credentials: 'include',
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     studentName: user?.name, phone: user?.phone,

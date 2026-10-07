@@ -21,7 +21,7 @@ export default function TrackingPage() {
     // Fetch booking details
     const fetchBooking = useCallback(async () => {
         try {
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/bookings/${bookingId}`);
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/bookings/${bookingId}`, { credentials: 'include' });
             if (res.ok) {
                 const data = await res.json();
                 setBooking(data.booking);
@@ -34,7 +34,7 @@ export default function TrackingPage() {
     // Poll tracking data
     const fetchTracking = useCallback(async () => {
         try {
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/tracking/${bookingId}`);
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/tracking/${bookingId}`, { credentials: 'include' });
             if (res.ok) {
                 const data = await res.json();
                 setTracking(data);
@@ -50,6 +50,7 @@ export default function TrackingPage() {
             try {
                 await fetch(`${import.meta.env.VITE_API_URL}/tracking/${bookingId}`, {
                     method: "POST",
+                    credentials: 'include',
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ lat, lng, role: "user" }),
                 });

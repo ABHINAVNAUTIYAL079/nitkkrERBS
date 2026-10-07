@@ -28,26 +28,35 @@ export default function DriverDashboard() {
     const gpsIntervalRef = useRef(null);
 
     const fetchDriver = useCallback(async () => {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/driver/availability`);
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/driver/availability`, { credentials: 'include' });
         if (res.status === 401) { navigate("/login"); return; }
         const data = await res.json();
         setDriver(data.driver);
     }, [navigate]);
 
     const fetchPending = useCallback(async () => {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/bookings/pending`);
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/bookings/pending`, { credentials: 'include' });
         if (res.ok) { const data = await res.json(); setBookings(data.bookings || []); }
     }, []);
 
     const fetchHistory = useCallback(async () => {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/driver/history`);
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/driver/history`, { credentials: 'include' });
         if (res.ok) { const data = await res.json(); setRideHistory(data.bookings || []); }
     }, []);
 
+    const fetchActiveRide = useCallback(async () => {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/driver/history`, { credentials: 'include' });
+        if (res.ok) {
+            const data = await res.json();
+            const active = (data.bookings || []).find(b => ["accepted", "on_the_way"].includes(b.status));
+            if (active) setMyRide(active);
+        }
+    }, []);
+
     const fetchAll = useCallback(async () => {
-        await Promise.all([fetchDriver(), fetchPending(), fetchHistory()]);
+        await Promise.all([fetchDriver(), fetchPending(), fetchHistory(), fetchActiveRide()]);
         setLoading(false);
-    }, [fetchDriver, fetchPending, fetchHistory]);
+    }, [fetchDriver, fetchPending, fetchHistory, fetchActiveRide]);
 
     useEffect(() => {
         fetchAll();
@@ -68,6 +77,7 @@ export default function DriverDashboard() {
                 (pos) => {
                     fetch(`${import.meta.env.VITE_API_URL}/tracking/${myRide._id}`, {
                         method: "POST",
+                        credentials: 'include',
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ lat: pos.coords.latitude, lng: pos.coords.longitude, role: "driver" }),
                     }).catch(() => { });
@@ -90,7 +100,7 @@ export default function DriverDashboard() {
     const handleAvailabilityToggle = async () => {
         if (!driver) return;
         try {
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/driver/availability`, { method: "PATCH" });
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/driver/availability`, { method: "PATCH", credentials: 'include' });
             const data = await res.json();
             if (!res.ok) { toast.error(data.message); return; }
             setDriver((prev) => prev ? { ...prev, isAvailable: data.isAvailable } : prev);
@@ -101,7 +111,7 @@ export default function DriverDashboard() {
     const handleAccept = async (booking) => {
         setUpdating(booking._id);
         try {
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/bookings/${booking._id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: "accepted" }) });
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/bookings/${booking._id}`, { method: "PATCH", credentials: 'include', headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: "accepted" }) });
             const data = await res.json();
             if (!res.ok) { toast.error(data.message); return; }
             setMyRide({ ...booking, status: "accepted" });
@@ -119,6 +129,7 @@ export default function DriverDashboard() {
         try {
             const res = await fetch(`${import.meta.env.VITE_API_URL}/bookings/${myRide._id}/verify-otp`, {
                 method: "POST",
+                credentials: 'include',
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ otp: otpInput }),
             });
@@ -134,7 +145,7 @@ export default function DriverDashboard() {
         if (!myRide) return;
         setUpdating(myRide._id);
         try {
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/bookings/${myRide._id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status }) });
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/bookings/${myRide._id}`, { method: "PATCH", credentials: 'include', headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status }) });
             const data = await res.json();
             if (!res.ok) { toast.error(data.message); return; }
             if (status === "completed") {
@@ -151,7 +162,7 @@ export default function DriverDashboard() {
         finally { setUpdating(null); }
     };
 
-    const handleLogout = async () => { await fetch(`${import.meta.env.VITE_API_URL}/auth/logout`, { method: "POST" }); navigate("/login"); };
+    const handleLogout = async () => { await fetch(`${import.meta.env.VITE_API_URL}/auth/logout`, { method: "POST", credentials: 'include' }); navigate("/login"); };
 
     if (loading) return (<div className="min-h-screen bg-slate-900 flex items-center justify-center"><Spinner size="lg" /></div>);
 
